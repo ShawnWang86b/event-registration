@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OldBoy SignUp Chain",
-  description: "SignUp Chain for OldBoy",
+  title: "Event Registration",
+  description: "Event Registration System for OldBoy basketball club",
 };
 
 export default function RootLayout({
