@@ -27,7 +27,6 @@ export async function POST(req: Request) {
 
   // Get the body
   const payload = await req.text();
-  // const body = JSON.parse(payload);
 
   // Create a new Svix instance with your webhook secret
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -41,7 +40,6 @@ export async function POST(req: Request) {
       "svix-signature": svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error("Error verifying webhook:", err);
     return new Response("Error occured", {
       status: 400,
     });
@@ -50,21 +48,16 @@ export async function POST(req: Request) {
   const { id } = evt.data;
   const eventType = evt.type;
 
-  if (eventType === "user.created") {
+  if (eventType === "user.created" || eventType === "user.updated") {
     try {
       const userData = {
-        name:
-          `${evt.data.first_name || ""} ${evt.data.last_name || ""}`.trim() ||
-          "Anonymous",
+        name: evt.data.username || "",
         email: evt.data.email_addresses?.[0]?.email_address || "",
         avatarUrl: evt.data.image_url || null,
         updatedAt: new Date(),
       };
 
-      console.log("Preparing to insert/update user with data:", userData);
-
       if (eventType === "user.created") {
-        // Create new user
         await db.insert(usersTable).values({
           id: id!,
           ...userData,
@@ -72,16 +65,10 @@ export async function POST(req: Request) {
           creditBalance: 0,
           createdAt: new Date(),
         });
-
-        console.log(`User ${id} created successfully`);
       } else {
-        // Update existing user
         await db.update(usersTable).set(userData).where(eq(usersTable.id, id!));
-
-        console.log(`User ${id} updated successfully`);
       }
     } catch (error) {
-      console.error("Error handling user webhook:", error);
       return new Response("Error processing webhook", { status: 500 });
     }
   }
@@ -89,9 +76,7 @@ export async function POST(req: Request) {
   if (eventType === "user.deleted") {
     try {
       await db.delete(usersTable).where(eq(usersTable.id, id!));
-      console.log(`User ${id} deleted`);
     } catch (error) {
-      console.error("Error deleting user:", error);
       return new Response("Error processing webhook", { status: 500 });
     }
   }
