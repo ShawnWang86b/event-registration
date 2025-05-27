@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   const svix_signature = (await headerPayload).get("svix-signature");
 
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error occured -- no svix headers", {
+    return new Response("Error occurred -- no svix headers", {
       status: 400,
     });
   }
@@ -39,8 +39,9 @@ export async function POST(req: Request) {
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent;
-  } catch (err) {
-    return new Response("Error occured", {
+  } catch (error) {
+    console.error("Error verifying webhook:", error);
+    return new Response("Error occurred during webhook verification", {
       status: 400,
     });
   }
@@ -69,6 +70,7 @@ export async function POST(req: Request) {
         await db.update(usersTable).set(userData).where(eq(usersTable.id, id!));
       }
     } catch (error) {
+      console.error("Error processing user webhook:", error);
       return new Response("Error processing webhook", { status: 500 });
     }
   }
@@ -77,6 +79,7 @@ export async function POST(req: Request) {
     try {
       await db.delete(usersTable).where(eq(usersTable.id, id!));
     } catch (error) {
+      console.error("Error processing user deletion:", error);
       return new Response("Error processing webhook", { status: 500 });
     }
   }

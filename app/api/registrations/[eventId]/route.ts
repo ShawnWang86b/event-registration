@@ -6,15 +6,14 @@ import { eq, and, sql } from "drizzle-orm";
 
 // PUT /api/registrations/:eventId
 // Admin endpoint to update all registrations for an event after it ends
-export async function PUT(
-  request: Request,
-  { params }: { params: { eventId: string } }
-) {
+export async function PUT(request: Request, context: any) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const eventId = context.params.eventId;
 
     // Check if user is admin
     const user = await db
@@ -37,7 +36,7 @@ export async function PUT(
     const event = await db
       .select()
       .from(eventsTable)
-      .where(eq(eventsTable.id, parseInt(params.eventId)))
+      .where(eq(eventsTable.id, parseInt(eventId)))
       .limit(1);
 
     if (!event.length) {
@@ -53,7 +52,7 @@ export async function PUT(
         paymentProcessed: paymentProcessed ?? false,
         updatedAt: new Date(),
       })
-      .where(eq(registrationsTable.eventId, parseInt(params.eventId)))
+      .where(eq(registrationsTable.eventId, parseInt(eventId)))
       .returning();
 
     return NextResponse.json(updatedRegistrations);
@@ -68,15 +67,14 @@ export async function PUT(
 
 // DELETE /api/registrations/:eventId
 // Cancel registration for the current user for a specific event
-export async function DELETE(
-  request: Request,
-  { params }: { params: { eventId: string } }
-) {
+export async function DELETE(request: Request, context: any) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const eventId = context.params.eventId;
 
     // Validate the registration exists and belongs to the user
     const registration = await db
@@ -84,7 +82,7 @@ export async function DELETE(
       .from(registrationsTable)
       .where(
         and(
-          eq(registrationsTable.eventId, parseInt(params.eventId)),
+          eq(registrationsTable.eventId, parseInt(eventId)),
           eq(registrationsTable.userId, userId)
         )
       )
@@ -110,7 +108,7 @@ export async function DELETE(
         })
         .where(
           and(
-            eq(registrationsTable.eventId, parseInt(params.eventId)),
+            eq(registrationsTable.eventId, parseInt(eventId)),
             eq(registrationsTable.userId, userId)
           )
         )
@@ -125,7 +123,7 @@ export async function DELETE(
         })
         .where(
           and(
-            eq(registrationsTable.eventId, parseInt(params.eventId)),
+            eq(registrationsTable.eventId, parseInt(eventId)),
             sql`${registrationsTable.position} > ${canceledPosition}`,
             eq(registrationsTable.status, "registered")
           )

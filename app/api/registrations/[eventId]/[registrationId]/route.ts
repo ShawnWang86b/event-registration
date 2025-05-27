@@ -6,15 +6,15 @@ import { eq, and } from "drizzle-orm";
 
 // PUT /api/registrations/:eventId/:registrationId
 // Admin endpoint to update a specific registration for an event
-export async function PUT(
-  request: Request,
-  { params }: { params: { eventId: string; registrationId: string } }
-) {
+export async function PUT(request: Request, context: any) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const eventId = context.params.eventId;
+    const registrationId = context.params.registrationId;
 
     // Check if user is admin
     const user = await db
@@ -39,8 +39,8 @@ export async function PUT(
       .from(registrationsTable)
       .where(
         and(
-          eq(registrationsTable.id, parseInt(params.registrationId)),
-          eq(registrationsTable.eventId, parseInt(params.eventId))
+          eq(registrationsTable.id, parseInt(registrationId)),
+          eq(registrationsTable.eventId, parseInt(eventId))
         )
       )
       .limit(1);
@@ -61,7 +61,7 @@ export async function PUT(
         paymentProcessed: paymentProcessed ?? registration[0].paymentProcessed,
         updatedAt: new Date(),
       })
-      .where(eq(registrationsTable.id, parseInt(params.registrationId)))
+      .where(eq(registrationsTable.id, parseInt(registrationId)))
       .returning();
 
     return NextResponse.json(updatedRegistration);
