@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user already has a registration for this event
+    // Check if user already has a registration for this event (including canceled ones)
     const existingRegistration = await db
       .select()
       .from(registrationsTable)
@@ -103,13 +103,68 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (existingRegistration.length > 0) {
-      return NextResponse.json(
-        { error: "Already registered for this event" },
-        { status: 400 }
-      );
+      // If user has a canceled registration, reactivate it
+      if (existingRegistration[0].status === "canceled") {
+        // Get current registered count to determine new status
+        const currentRegisteredCount = await db
+          .select({ count: count() })
+          .from(registrationsTable)
+          .where(
+            and(
+              eq(registrationsTable.eventId, eventId),
+              eq(registrationsTable.status, "registered")
+            )
+          );
+
+        const newStatus =
+          currentRegisteredCount[0].count < event[0].maxAttendees
+            ? "registered"
+            : "waitlist";
+
+        // Get new position
+        const totalRegistrations = await db
+          .select({ count: count() })
+          .from(registrationsTable)
+          .where(eq(registrationsTable.eventId, eventId));
+
+        const [updatedRegistration] = await db
+          .update(registrationsTable)
+          .set({
+            status: newStatus,
+            position: totalRegistrations[0].count + 1,
+            registrationDate: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(registrationsTable.id, existingRegistration[0].id))
+          .returning();
+
+        return NextResponse.json(updatedRegistration, { status: 200 });
+      } else {
+        return NextResponse.json(
+          { error: "Already registered for this event" },
+          { status: 400 }
+        );
+      }
     }
 
-    // Get the current position (count of registrations for this event)
+    // Get current registered count to determine status
+    const currentRegisteredCount = await db
+      .select({ count: count() })
+      .from(registrationsTable)
+      .where(
+        and(
+          eq(registrationsTable.eventId, eventId),
+          eq(registrationsTable.status, "registered")
+        )
+      );
+
+    // Determine if user should be registered or waitlisted
+    const status =
+      currentRegisteredCount[0].count < event[0].maxAttendees
+        ? "registered"
+        : "waitlist";
+
+    // Get the current position (count of all registrations for this event)
     const positionResult = await db
       .select({ count: count() })
       .from(registrationsTable)
@@ -122,7 +177,8 @@ export async function POST(request: Request) {
         userId,
         eventId,
         position: positionResult[0].count + 1,
-        status: "registered",
+        status: status,
+        registrationDate: new Date(),
       })
       .returning();
 

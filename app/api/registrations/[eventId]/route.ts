@@ -4,6 +4,98 @@ import { db } from "@/db";
 import { registrationsTable, eventsTable, usersTable } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 
+// GET /api/registrations/:eventId
+// Get all registrations for a specific event (public access)
+export async function GET(request: Request, context: any) {
+  try {
+    const eventId = context.params.eventId;
+
+    // Get event details
+    const event = await db.query.eventsTable.findFirst({
+      where: eq(eventsTable.id, parseInt(eventId)),
+    });
+
+    if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    // Get all registrations for the event with user details
+    const registrations = await db
+      .select({
+        id: registrationsTable.id,
+        userId: registrationsTable.userId,
+        eventId: registrationsTable.eventId,
+        registrationDate: registrationsTable.registrationDate,
+        status: registrationsTable.status,
+        position: registrationsTable.position,
+        hasAttended: registrationsTable.hasAttended,
+        paymentProcessed: registrationsTable.paymentProcessed,
+        createdAt: registrationsTable.createdAt,
+        updatedAt: registrationsTable.updatedAt,
+        user: {
+          id: usersTable.id,
+          name: usersTable.name,
+          email: usersTable.email,
+          // Don't expose sensitive user data like role and creditBalance to public
+        },
+        event: {
+          id: eventsTable.id,
+          title: eventsTable.title,
+          description: eventsTable.description,
+          price: eventsTable.price,
+          startDate: eventsTable.startDate,
+          endDate: eventsTable.endDate,
+          location: eventsTable.location,
+          maxAttendees: eventsTable.maxAttendees,
+        },
+      })
+      .from(registrationsTable)
+      .leftJoin(usersTable, eq(registrationsTable.userId, usersTable.id))
+      .leftJoin(eventsTable, eq(registrationsTable.eventId, eventsTable.id))
+      .where(eq(registrationsTable.eventId, parseInt(eventId)))
+      .orderBy(registrationsTable.position);
+
+    // Calculate summary statistics
+    const summary = {
+      totalRegistrations: registrations.length,
+      registeredCount: registrations.filter((r) => r.status === "registered")
+        .length,
+      waitlistCount: registrations.filter((r) => r.status === "waitlist")
+        .length,
+      canceledCount: registrations.filter((r) => r.status === "canceled")
+        .length,
+      attendedCount: registrations.filter((r) => r.hasAttended).length,
+      paymentProcessedCount: registrations.filter((r) => r.paymentProcessed)
+        .length,
+      availableSpots:
+        event.maxAttendees -
+        registrations.filter((r) => r.status === "registered").length,
+    };
+
+    return NextResponse.json({
+      event: {
+        id: event.id,
+        title: event.title,
+        currentRegistrations: registrations.filter(
+          (r) => r.status === "registered"
+        ).length,
+        maxAttendees: event.maxAttendees,
+        registrationStatus: `${
+          registrations.filter((r) => r.status === "registered").length
+        } / ${event.maxAttendees}`,
+      },
+      summary,
+      registrations,
+    });
+  } catch (error) {
+    console.error("Error fetching event registrations:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 // PUT /api/registrations/:eventId
 // Admin endpoint to update all registrations for an event after it ends
 export async function PUT(request: Request, context: any) {
