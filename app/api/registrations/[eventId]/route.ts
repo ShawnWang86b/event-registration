@@ -8,7 +8,7 @@ import { eq, and, sql } from "drizzle-orm";
 // Get all registrations for a specific event (public access)
 export async function GET(request: Request, context: any) {
   try {
-    const eventId = context.params.eventId;
+    const eventId = await context.params.eventId;
 
     // Get event details
     const event = await db.query.eventsTable.findFirst({
