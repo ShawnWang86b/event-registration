@@ -1,3 +1,6 @@
+// Export auth hooks
+export { useCurrentUser, authKeys } from "./use-auth";
+
 // Export all event hooks
 export {
   useEvents,
@@ -15,6 +18,8 @@ export {
   useCreateRegistration,
   useCancelRegistration,
   useDeleteRegistration,
+  useJoinEvent,
+  useCancelEventRegistration,
   registrationKeys,
 } from "./use-registrations";
 
@@ -25,6 +30,14 @@ export {
   useRegistrationTransactions,
   transactionKeys,
 } from "./use-transactions";
+
+// Export admin hooks
+export {
+  useSearchUsers,
+  useUserBalance,
+  useAdjustUserBalance,
+  adminKeys,
+} from "./use-admin";
 
 // Export existing hooks
 export { useIsMobile } from "./use-mobile";

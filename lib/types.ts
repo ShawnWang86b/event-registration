@@ -102,3 +102,114 @@ export interface RegistrationsQueryParams {
   userId?: string;
   status?: Registration["status"];
 }
+
+// Event Registrations Response (for /api/registrations/[eventId])
+export interface EventRegistrationsUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface EventRegistration {
+  id: number;
+  userId: string;
+  eventId: number;
+  registrationDate: string;
+  status: "registered" | "waitlist" | "canceled";
+  position: number;
+  hasAttended: boolean;
+  paymentProcessed: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user: EventRegistrationsUser;
+  event: {
+    id: number;
+    title: string;
+    description: string;
+    price: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    maxAttendees: number;
+  };
+}
+
+export interface EventRegistrationsResponse {
+  event: {
+    id: number;
+    title: string;
+    currentRegistrations: number;
+    maxAttendees: number;
+    registrationStatus: string;
+  };
+  summary: {
+    totalRegistrations: number;
+    registeredCount: number;
+    waitlistCount: number;
+    canceledCount: number;
+    attendedCount: number;
+    paymentProcessedCount: number;
+    availableSpots: number;
+  };
+  registrations: EventRegistration[];
+}
+
+// Admin Balance Management Types
+export interface BalanceAdjustmentData {
+  action: "add" | "subtract";
+  amount: number;
+}
+
+export interface BalanceAdjustmentResponse {
+  success: boolean;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    previousBalance: number;
+    newBalance: number;
+    adjustment: number;
+  };
+  action: "add" | "subtract";
+  amount: number;
+  adjustedBy: string;
+  timestamp: string;
+}
+
+export interface UserBalanceInfo {
+  id: string;
+  name: string;
+  email: string;
+  creditBalance: number;
+  role: "user" | "admin";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// User search types
+export interface UserSearchResult {
+  id: string;
+  name: string;
+  email: string;
+  creditBalance: number;
+  role: "user" | "admin";
+}
+
+export interface UsersSearchResponse {
+  users: UserSearchResult[];
+}
+
+// Current user types
+export interface CurrentUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "user" | "admin";
+  creditBalance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CurrentUserResponse {
+  user: CurrentUser;
+}

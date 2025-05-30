@@ -9,6 +9,12 @@ import {
   Transaction,
   EventsQueryParams,
   RegistrationsQueryParams,
+  EventRegistrationsResponse,
+  BalanceAdjustmentData,
+  BalanceAdjustmentResponse,
+  UserBalanceInfo,
+  UsersSearchResponse,
+  CurrentUserResponse,
 } from "./types";
 
 // Events API
@@ -78,7 +84,9 @@ export const registrationsApi = {
   },
 
   // Get registrations for specific event
-  getEventRegistrations: async (eventId: number): Promise<Registration[]> => {
+  getEventRegistrations: async (
+    eventId: number
+  ): Promise<EventRegistrationsResponse> => {
     try {
       const response = await apiClient.get(`/registrations/${eventId}`);
       return response.data;
@@ -156,9 +164,64 @@ export const transactionsApi = {
   },
 };
 
+// Admin API
+export const adminApi = {
+  // Search users by name or email
+  searchUsers: async (query?: string): Promise<UsersSearchResponse> => {
+    try {
+      const params = query ? { q: query } : {};
+      const response = await apiClient.get("/admin/users", { params });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Get user balance information
+  getUserBalance: async (userId: string): Promise<UserBalanceInfo> => {
+    try {
+      const response = await apiClient.get(`/admin/users/${userId}/balance`);
+      return response.data.user;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Adjust user balance (add or subtract credits)
+  adjustUserBalance: async (
+    userId: string,
+    data: BalanceAdjustmentData
+  ): Promise<BalanceAdjustmentResponse> => {
+    try {
+      const response = await apiClient.put(
+        `/admin/users/${userId}/balance`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+};
+
+// Auth API
+export const authApi = {
+  // Get current user information from database
+  getCurrentUser: async (): Promise<CurrentUserResponse> => {
+    try {
+      const response = await apiClient.get("/auth/me");
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+};
+
 // Combined API object
 export const api = {
+  auth: authApi,
   events: eventsApi,
   registrations: registrationsApi,
   transactions: transactionsApi,
+  admin: adminApi,
 };

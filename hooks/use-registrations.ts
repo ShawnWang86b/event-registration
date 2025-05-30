@@ -4,6 +4,7 @@ import {
   Registration,
   CreateRegistrationData,
   RegistrationsQueryParams,
+  EventRegistrationsResponse,
 } from "@/lib/types";
 
 // Query keys
@@ -32,8 +33,11 @@ export const useEventRegistrations = (eventId: number) => {
   return useQuery({
     queryKey: registrationKeys.byEvent(eventId),
     queryFn: () => api.registrations.getEventRegistrations(eventId),
-    enabled: !!eventId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 0, // Always fetch fresh data for accurate summary statistics
+    gcTime: 30 * 1000, // Keep in cache for 30 seconds
+    enabled: !!eventId, // Only run query if eventId is provided
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window gains focus
   });
 };
 
@@ -109,6 +113,78 @@ export const useDeleteRegistration = () => {
     },
     onError: (error) => {
       console.error("Failed to delete registration:", error);
+    },
+  });
+};
+
+// Join event mutation (for event registrations)
+export const useJoinEvent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateRegistrationData) =>
+      api.registrations.createRegistration(data),
+    onSuccess: async (newRegistration) => {
+      // Remove cached data for this event to force fresh fetch
+      queryClient.removeQueries({
+        queryKey: registrationKeys.byEvent(newRegistration.eventId),
+      });
+
+      // Invalidate all registration-related queries
+      await queryClient.invalidateQueries({
+        queryKey: registrationKeys.all,
+      });
+
+      // Force immediate refetch of the event registrations
+      await queryClient.refetchQueries({
+        queryKey: registrationKeys.byEvent(newRegistration.eventId),
+        exact: true,
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to join event:", error);
+    },
+  });
+};
+
+// Cancel event registration mutation (for event registrations)
+export const useCancelEventRegistration = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (eventId: number) => {
+      // Use the DELETE endpoint for canceling registration
+      return fetch(`/api/registrations/${eventId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to cancel registration");
+        }
+        return response.json();
+      });
+    },
+    onSuccess: async (_, eventId) => {
+      // Remove all cached data for this event to force fresh fetch
+      queryClient.removeQueries({
+        queryKey: registrationKeys.byEvent(eventId),
+      });
+
+      // Invalidate all registration-related queries
+      await queryClient.invalidateQueries({
+        queryKey: registrationKeys.all,
+      });
+
+      // Force immediate refetch of the event registrations
+      await queryClient.refetchQueries({
+        queryKey: registrationKeys.byEvent(eventId),
+        exact: true,
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to cancel event registration:", error);
     },
   });
 };

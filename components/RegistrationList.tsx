@@ -1,51 +1,10 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface Registration {
-  id: number;
-  userId: string;
-  eventId: number;
-  registrationDate: string;
-  status: "registered" | "waitlist" | "canceled";
-  position: number;
-  hasAttended: boolean;
-  paymentProcessed: boolean;
-  createdAt: string;
-  updatedAt: string;
-  user: User;
-}
-
-interface Event {
-  id: number;
-  title: string;
-  maxAttendees: number;
-}
-
-interface RegistrationData {
-  event: {
-    id: number;
-    title: string;
-    currentRegistrations: number;
-    maxAttendees: number;
-    registrationStatus: string;
-  };
-  summary: {
-    totalRegistrations: number;
-    registeredCount: number;
-    waitlistCount: number;
-    canceledCount: number;
-    attendedCount: number;
-    paymentProcessedCount: number;
-    availableSpots: number;
-  };
-  registrations: Registration[];
-}
+import {
+  useEventRegistrations,
+  useJoinEvent,
+  useCancelEventRegistration,
+} from "@/hooks/use-registrations";
+import React from "react";
 
 interface RegistrationListProps {
   eventId: number;
@@ -57,100 +16,78 @@ const RegistrationList = ({
   isInline = false,
 }: RegistrationListProps) => {
   const { userId } = useAuth();
-  const [data, setData] = useState<RegistrationData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [registering, setRegistering] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchRegistrations = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/registrations/${eventId}`);
-      if (response.ok) {
-        const registrationData = await response.json();
-        setData(registrationData);
-      } else {
-        setError("Failed to fetch registrations");
-      }
-    } catch (error) {
-      console.error("Error fetching registrations:", error);
-      setError("Error loading registrations");
-    } finally {
-      setLoading(false);
+  // Use TanStack Query for data fetching
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useEventRegistrations(eventId);
+
+  // Debug: Log summary data changes
+  React.useEffect(() => {
+    if (data?.summary) {
+      console.log("Summary updated:", {
+        registeredCount: data.summary.registeredCount,
+        waitlistCount: data.summary.waitlistCount,
+        availableSpots: data.summary.availableSpots,
+        totalRegistrations: data.summary.totalRegistrations,
+      });
     }
-  };
+  }, [data?.summary]);
 
-  useEffect(() => {
-    fetchRegistrations();
-  }, [eventId]);
+  // Mutations
+  const joinEventMutation = useJoinEvent();
+  const cancelRegistrationMutation = useCancelEventRegistration();
+
+  // Convert query error to string for display
+  const error = queryError ? "Error loading registrations" : null;
+  const registering = joinEventMutation.isPending;
 
   const handleJoinEvent = async () => {
     if (!userId) {
-      setError("Please sign in to register for events");
       return;
     }
 
     try {
-      setRegistering(true);
-      setError(null);
-
-      const response = await fetch("/api/registrations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          eventId: eventId,
-        }),
+      await joinEventMutation.mutateAsync({
+        eventId: eventId,
       });
-
-      if (response.ok) {
-        // Refresh the registration list
-        await fetchRegistrations();
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to register for event");
-      }
     } catch (error) {
       console.error("Error registering for event:", error);
-      setError("Error registering for event");
-    } finally {
-      setRegistering(false);
     }
   };
 
   const handleCancelRegistration = async () => {
     if (!userId) {
-      setError("Please sign in to cancel registration");
       return;
     }
 
     try {
-      setError(null);
-
-      const response = await fetch(`/api/registrations/${eventId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        // Refresh the registration list
-        await fetchRegistrations();
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to cancel registration");
-      }
+      await cancelRegistrationMutation.mutateAsync(eventId);
     } catch (error) {
       console.error("Error canceling registration:", error);
-      setError("Error canceling registration");
     }
   };
 
   const isUserRegistered = data?.registrations.some(
     (reg) => reg.userId === userId && reg.status !== "canceled"
   );
+
+  // Display mutation errors with more specific messages
+  const getErrorMessage = () => {
+    if (error) return error;
+    if (joinEventMutation.error) {
+      return "Failed to join event. Please try again.";
+    }
+    if (cancelRegistrationMutation.error) {
+      return "Failed to cancel registration. Please try again.";
+    }
+    return null;
+  };
+
+  const displayError = getErrorMessage();
 
   if (loading) {
     return (
@@ -196,19 +133,23 @@ const RegistrationList = ({
         <div className="mb-6">
           <button
             onClick={handleJoinEvent}
-            disabled={registering}
+            disabled={registering || !userId}
             className="flex items-center gap-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-colors w-full justify-center text-lg"
           >
             <span className="text-xl">+</span>
-            {registering ? "Joining..." : "Join This Event"}
+            {!userId
+              ? "Sign in to join"
+              : registering
+              ? "Joining..."
+              : "Join This Event"}
           </button>
         </div>
       )}
 
       {/* Error Message */}
-      {error && (
+      {displayError && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+          {displayError}
         </div>
       )}
 
@@ -288,9 +229,12 @@ const RegistrationList = ({
                   {registration.userId === userId && (
                     <button
                       onClick={handleCancelRegistration}
-                      className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full transition-colors"
+                      disabled={cancelRegistrationMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white text-xs px-3 py-1 rounded-full transition-colors"
                     >
-                      Cancel
+                      {cancelRegistrationMutation.isPending
+                        ? "Canceling..."
+                        : "Cancel"}
                     </button>
                   )}
                 </div>
@@ -343,9 +287,12 @@ const RegistrationList = ({
                   {registration.userId === userId && (
                     <button
                       onClick={handleCancelRegistration}
-                      className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full transition-colors"
+                      disabled={cancelRegistrationMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white text-xs px-3 py-1 rounded-full transition-colors"
                     >
-                      Cancel
+                      {cancelRegistrationMutation.isPending
+                        ? "Canceling..."
+                        : "Cancel"}
                     </button>
                   )}
                 </div>

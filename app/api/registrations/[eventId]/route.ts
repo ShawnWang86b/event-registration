@@ -191,6 +191,17 @@ export async function DELETE(request: Request, context: any) {
 
     // Start a transaction to ensure all updates are atomic
     const result = await db.transaction(async (tx) => {
+      // Get event details for capacity check
+      const event = await tx
+        .select()
+        .from(eventsTable)
+        .where(eq(eventsTable.id, parseInt(eventId)))
+        .limit(1);
+
+      if (!event.length) {
+        throw new Error("Event not found");
+      }
+
       // Cancel the registration
       const [canceledRegistration] = await tx
         .update(registrationsTable)
@@ -220,6 +231,61 @@ export async function DELETE(request: Request, context: any) {
             eq(registrationsTable.status, "registered")
           )
         );
+
+      // Check if there's space available and promote first waitlist person
+      const currentRegisteredCount = await tx
+        .select({ count: sql`count(*)` })
+        .from(registrationsTable)
+        .where(
+          and(
+            eq(registrationsTable.eventId, parseInt(eventId)),
+            eq(registrationsTable.status, "registered")
+          )
+        );
+
+      const registeredCount = Number(currentRegisteredCount[0].count);
+
+      // If there's space available, promote the first person from waitlist
+      if (registeredCount < event[0].maxAttendees) {
+        const firstWaitlistPerson = await tx
+          .select()
+          .from(registrationsTable)
+          .where(
+            and(
+              eq(registrationsTable.eventId, parseInt(eventId)),
+              eq(registrationsTable.status, "waitlist")
+            )
+          )
+          .orderBy(registrationsTable.position)
+          .limit(1);
+
+        if (firstWaitlistPerson.length > 0) {
+          // Promote the first waitlist person to registered
+          await tx
+            .update(registrationsTable)
+            .set({
+              status: "registered",
+              position: registeredCount + 1, // New position at the end of registered list
+              updatedAt: new Date(),
+            })
+            .where(eq(registrationsTable.id, firstWaitlistPerson[0].id));
+
+          // Update positions of remaining waitlist people
+          await tx
+            .update(registrationsTable)
+            .set({
+              position: sql`${registrationsTable.position} - 1`,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(registrationsTable.eventId, parseInt(eventId)),
+                eq(registrationsTable.status, "waitlist"),
+                sql`${registrationsTable.position} > ${firstWaitlistPerson[0].position}`
+              )
+            );
+        }
+      }
 
       return canceledRegistration;
     });
