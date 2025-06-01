@@ -15,6 +15,7 @@ import {
   UserBalanceInfo,
   UsersSearchResponse,
   CurrentUserResponse,
+  EndEventResponse,
 } from "./types";
 
 // Events API
@@ -63,6 +64,31 @@ export const eventsApi = {
   deleteEvent: async (id: number): Promise<void> => {
     try {
       await apiClient.delete(`/events?id=${id}`);
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // End event (admin only)
+  endEvent: async (eventId: number): Promise<EndEventResponse> => {
+    try {
+      const response = await apiClient.post(`/events/${eventId}/end`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Toggle event active status (admin only)
+  toggleEventStatus: async (
+    eventId: number,
+    isActive: boolean
+  ): Promise<Event> => {
+    try {
+      const response = await apiClient.patch(`/events/${eventId}/toggle`, {
+        isActive,
+      });
+      return response.data.event;
     } catch (error) {
       throw handleApiError(error as AxiosError);
     }

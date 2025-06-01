@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { usersTable } from "@/db/schema";
+import { usersTable, creditTransactionsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 // PUT /api/admin/users/:userId/balance
@@ -69,11 +69,16 @@ export async function PUT(request: Request, context: any) {
     // Calculate new balance
     const currentBalance = targetUser[0].creditBalance;
     let newBalance: number;
+    let transactionAmount: number;
+    let transactionType: "admin_adjust" = "admin_adjust";
 
     if (action === "add") {
       newBalance = currentBalance + amount;
+      transactionAmount = amount; // Positive amount for adding credits
     } else {
       newBalance = currentBalance - amount;
+      transactionAmount = -amount; // Negative amount for subtracting credits
+
       // Prevent negative balance
       if (newBalance < 0) {
         return NextResponse.json(
@@ -85,25 +90,54 @@ export async function PUT(request: Request, context: any) {
       }
     }
 
-    // Update user balance
-    const [updatedUser] = await db
-      .update(usersTable)
-      .set({
-        creditBalance: newBalance,
-        updatedAt: new Date(),
-      })
-      .where(eq(usersTable.id, userId))
-      .returning();
+    // Start a transaction to ensure atomicity
+    const result = await db.transaction(async (tx) => {
+      // Update user balance
+      const [updatedUser] = await tx
+        .update(usersTable)
+        .set({
+          creditBalance: newBalance,
+          updatedAt: new Date(),
+        })
+        .where(eq(usersTable.id, userId))
+        .returning();
+
+      // Create transaction record for audit trail
+      const [transaction] = await tx
+        .insert(creditTransactionsTable)
+        .values({
+          userId: userId,
+          amount: transactionAmount.toString(),
+          balanceAfter: newBalance.toString(),
+          type: transactionType,
+          description: `Admin ${action}: ${amount} credits by ${currentUser[0].name}`,
+        })
+        .returning();
+
+      return { updatedUser, transaction };
+    });
+
+    // Log the transaction for additional audit trail
+    console.log(
+      `Admin ${currentUserId} ${action}ed ${amount} credits to user ${userId}. Transaction ID: ${result.transaction.id}`
+    );
 
     return NextResponse.json({
       success: true,
       user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        email: updatedUser.email,
+        id: result.updatedUser.id,
+        name: result.updatedUser.name,
+        email: result.updatedUser.email,
         previousBalance: currentBalance,
-        newBalance: updatedUser.creditBalance,
-        adjustment: action === "add" ? amount : -amount,
+        newBalance: result.updatedUser.creditBalance,
+        adjustment: transactionAmount,
+      },
+      transaction: {
+        id: result.transaction.id,
+        amount: transactionAmount,
+        type: transactionType,
+        description: result.transaction.description,
+        createdAt: result.transaction.createdAt,
       },
       action,
       amount,

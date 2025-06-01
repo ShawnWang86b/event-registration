@@ -73,21 +73,70 @@ export const useUpdateEvent = () => {
   });
 };
 
-// Delete event mutation
+// Delete event mutation (admin only)
 export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: number) => api.events.deleteEvent(id),
-    onSuccess: (_, deletedId) => {
-      // Invalidate and refetch events list
-      queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
-
-      // Remove the deleted event from cache
-      queryClient.removeQueries({ queryKey: eventKeys.detail(deletedId) });
+    onSuccess: () => {
+      // Invalidate events queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Failed to delete event:", error);
+    },
+  });
+};
+
+// End event mutation (admin only)
+export const useEndEvent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (eventId: number) => api.events.endEvent(eventId),
+    onSuccess: (data, eventId) => {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["admin"] });
+
+      // Log success
+      console.log("Event ended successfully:", data.summary);
+    },
+    onError: (error: any) => {
+      console.error("Failed to end event:", error);
+    },
+  });
+};
+
+// Toggle event status mutation (admin only)
+export const useToggleEventStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      isActive,
+    }: {
+      eventId: number;
+      isActive: boolean;
+    }) => api.events.toggleEventStatus(eventId, isActive),
+    onSuccess: (updatedEvent) => {
+      // Invalidate and update queries
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
+
+      // Update the specific event in cache
+      queryClient.setQueryData(eventKeys.detail(updatedEvent.id), updatedEvent);
+
+      // Log success
+      console.log(
+        `Event ${updatedEvent.isActive ? "activated" : "deactivated"}:`,
+        updatedEvent.title
+      );
+    },
+    onError: (error: any) => {
+      console.error("Failed to toggle event status:", error);
     },
   });
 };

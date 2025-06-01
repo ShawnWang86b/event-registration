@@ -13,8 +13,7 @@ export async function PUT(request: Request, context: any) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const eventId = context.params.eventId;
-    const registrationId = context.params.registrationId;
+    const { eventId, registrationId } = await context.params;
 
     // Check if user is admin
     const user = await db

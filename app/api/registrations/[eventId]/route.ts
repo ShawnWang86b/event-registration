@@ -8,7 +8,7 @@ import { eq, and, sql } from "drizzle-orm";
 // Get all registrations for a specific event (public access)
 export async function GET(request: Request, context: any) {
   try {
-    const eventId = await context.params.eventId;
+    const { eventId } = await context.params;
 
     // Get event details
     const event = await db.query.eventsTable.findFirst({
@@ -105,7 +105,7 @@ export async function PUT(request: Request, context: any) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const eventId = context.params.eventId;
+    const { eventId } = await context.params;
 
     // Check if user is admin
     const user = await db
@@ -166,7 +166,7 @@ export async function DELETE(request: Request, context: any) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const eventId = context.params.eventId;
+    const { eventId } = await context.params;
 
     // Validate the registration exists and belongs to the user
     const registration = await db

@@ -62,9 +62,17 @@ export default function AdminPage() {
       setSearchQuery("");
 
       if (failed === 0) {
-        alert(
-          `Successfully added ${data.amount} credits to ${successful} user(s)`
-        );
+        // Build success message with transaction details
+        let message = `Successfully added ${data.amount} credits to ${successful} user(s)\n\n`;
+
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            const response = result.value;
+            message += `✅ ${selectedUsers[index]?.name}: +$${data.amount} (Transaction #${response.transaction.id})\n`;
+          }
+        });
+
+        alert(message);
       } else {
         alert(
           `Added credits to ${successful} user(s), but ${failed} failed. Please check the console for details.`

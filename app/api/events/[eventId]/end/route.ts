@@ -7,88 +7,125 @@ import {
   usersTable,
   creditTransactionsTable,
 } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
-// POST /api/events/:eventId/end
+// Types for the response
+interface DeductionResult {
+  userId: string;
+  userName: string;
+  previousBalance: number;
+  newBalance: number;
+  deducted: number;
+  transactionId: number;
+}
+
+interface DeductionError {
+  userId: string;
+  userName: string;
+  currentBalance: number;
+  eventPrice: number;
+  deficit: number;
+}
+
+// POST /api/events/[eventId]/end
+// Admin endpoint to end an event and deduct attendees' balances
 export async function POST(request: Request, context: any) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const { userId: currentUserId } = await auth();
+    if (!currentUserId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const eventId = context.params.eventId;
+    const { eventId } = await context.params;
+    const eventIdNum = parseInt(eventId);
 
-    // Check if user is admin
-    const user = await db.query.usersTable.findFirst({
-      where: eq(usersTable.id, userId),
-    });
+    if (isNaN(eventIdNum)) {
+      return NextResponse.json({ error: "Invalid event ID" }, { status: 400 });
+    }
 
-    if (!user || user.role !== "admin") {
+    // Check if current user is admin
+    const currentUser = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, currentUserId))
+      .limit(1);
+
+    if (!currentUser.length || currentUser[0].role !== "admin") {
       return NextResponse.json(
         { error: "Only admins can end events" },
         { status: 403 }
       );
     }
 
-    // Get event details
-    const event = await db.query.eventsTable.findFirst({
-      where: eq(eventsTable.id, parseInt(eventId)),
-    });
+    // Check if event exists and is active
+    const event = await db
+      .select()
+      .from(eventsTable)
+      .where(eq(eventsTable.id, eventIdNum))
+      .limit(1);
 
-    if (!event) {
+    if (!event.length) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    // Get all registered attendees who haven't had payment processed
+    if (!event[0].isActive) {
+      return NextResponse.json(
+        { error: "Event is already ended" },
+        { status: 400 }
+      );
+    }
+
+    // Get all registered attendees with their registration info
     const registrations = await db
       .select({
         id: registrationsTable.id,
         userId: registrationsTable.userId,
-        status: registrationsTable.status,
-        paymentProcessed: registrationsTable.paymentProcessed,
+        user: {
+          id: usersTable.id,
+          name: usersTable.name,
+          email: usersTable.email,
+          creditBalance: usersTable.creditBalance,
+        },
       })
       .from(registrationsTable)
+      .innerJoin(usersTable, eq(registrationsTable.userId, usersTable.id))
       .where(
         and(
-          eq(registrationsTable.eventId, parseInt(eventId)),
-          eq(registrationsTable.status, "registered"),
-          eq(registrationsTable.paymentProcessed, false)
+          eq(registrationsTable.eventId, eventIdNum),
+          eq(registrationsTable.status, "registered")
         )
       );
 
-    // Process payments for each registration
-    const results = await db.transaction(async (tx) => {
-      const processedResults = [];
+    const eventPrice = parseFloat(event[0].price);
+    const deductionResults: DeductionResult[] = [];
+    const errors: DeductionError[] = [];
 
+    // Start a transaction to ensure data consistency
+    await db.transaction(async (tx) => {
+      // End the event first
+      await tx
+        .update(eventsTable)
+        .set({
+          isActive: false,
+          updatedAt: new Date(),
+        })
+        .where(eq(eventsTable.id, eventIdNum));
+
+      // Deduct balance from each registered attendee
       for (const registration of registrations) {
-        // Get user's current balance
-        const user = await tx.query.usersTable.findFirst({
-          where: eq(usersTable.id, registration.userId),
-        });
-
-        if (!user) {
-          continue; // Skip if user not found
-        }
-
-        const currentBalance = user.creditBalance;
-        const eventPrice = parseFloat(event.price);
+        const currentBalance = registration.user.creditBalance;
         const newBalance = currentBalance - eventPrice;
 
-        // Create transaction record
-        const [transaction] = await tx
-          .insert(creditTransactionsTable)
-          .values({
+        if (newBalance < 0) {
+          errors.push({
             userId: registration.userId,
-            amount: (-eventPrice).toString(), // Negative amount for spending
-            balanceAfter: newBalance.toString(),
-            type: "spend",
-            description: `Payment for event: ${event.title}`,
-            eventId: event.id,
-            registrationId: registration.id,
-            createdAt: new Date(),
-          })
-          .returning();
+            userName: registration.user.name,
+            currentBalance,
+            eventPrice,
+            deficit: eventPrice - currentBalance,
+          });
+          continue;
+        }
 
         // Update user balance
         await tx
@@ -99,28 +136,54 @@ export async function POST(request: Request, context: any) {
           })
           .where(eq(usersTable.id, registration.userId));
 
-        // Mark registration as payment processed
-        await tx
-          .update(registrationsTable)
-          .set({
-            paymentProcessed: true,
-            updatedAt: new Date(),
+        // Create transaction record
+        const [transaction] = await tx
+          .insert(creditTransactionsTable)
+          .values({
+            userId: registration.userId,
+            amount: (-eventPrice).toString(), // Negative amount for spending
+            balanceAfter: newBalance.toString(),
+            type: "spend",
+            description: `Event fee deduction: ${event[0].title}`,
+            eventId: eventIdNum,
+            registrationId: registration.id,
           })
-          .where(eq(registrationsTable.id, registration.id));
+          .returning();
 
-        processedResults.push({
+        deductionResults.push({
           userId: registration.userId,
-          transaction,
+          userName: registration.user.name,
+          previousBalance: currentBalance,
           newBalance,
+          deducted: eventPrice,
+          transactionId: transaction.id,
         });
       }
-
-      return processedResults;
     });
 
+    // Log the action
+    console.log(
+      `Admin ${currentUserId} ended event ${eventIdNum}. Deducted ${eventPrice} credits from ${deductionResults.length} attendees. Created ${deductionResults.length} transaction records.`
+    );
+
     return NextResponse.json({
-      message: "Event ended successfully",
-      processedPayments: results,
+      success: true,
+      event: {
+        id: event[0].id,
+        title: event[0].title,
+        price: eventPrice,
+      },
+      deductionResults,
+      errors,
+      summary: {
+        totalAttendees: registrations.length,
+        successfulDeductions: deductionResults.length,
+        failedDeductions: errors.length,
+        totalDeducted: deductionResults.length * eventPrice,
+        transactionsCreated: deductionResults.length,
+      },
+      endedBy: currentUser[0].name,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error("Error ending event:", error);

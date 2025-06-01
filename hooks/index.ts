@@ -8,6 +8,7 @@ export {
   useCreateEvent,
   useUpdateEvent,
   useDeleteEvent,
+  useEndEvent,
   eventKeys,
 } from "./use-events";
 

@@ -30,6 +30,21 @@ export interface CreateEventData {
 
 export interface UpdateEventData extends Partial<CreateEventData> {
   id: number;
+  isActive?: boolean;
+}
+
+// Event form types for components
+export interface EventFormData {
+  title: string;
+  description: string;
+  price: number;
+  startDate: string;
+  endDate: string;
+  location?: string;
+  isPeriodic: boolean;
+  frequency?: string;
+  maxAttendees: number;
+  isActive: boolean;
 }
 
 // Registration types
@@ -170,6 +185,13 @@ export interface BalanceAdjustmentResponse {
     newBalance: number;
     adjustment: number;
   };
+  transaction: {
+    id: number;
+    amount: number;
+    type: "admin_adjust";
+    description: string;
+    createdAt: Date;
+  };
   action: "add" | "subtract";
   amount: number;
   adjustedBy: string;
@@ -212,4 +234,38 @@ export interface CurrentUser {
 
 export interface CurrentUserResponse {
   user: CurrentUser;
+}
+
+// End Event Types
+export interface EndEventResponse {
+  success: boolean;
+  event: {
+    id: number;
+    title: string;
+    price: number;
+  };
+  deductionResults: {
+    userId: string;
+    userName: string;
+    previousBalance: number;
+    newBalance: number;
+    deducted: number;
+    transactionId: number;
+  }[];
+  errors: {
+    userId: string;
+    userName: string;
+    currentBalance: number;
+    eventPrice: number;
+    deficit: number;
+  }[];
+  summary: {
+    totalAttendees: number;
+    successfulDeductions: number;
+    failedDeductions: number;
+    totalDeducted: number;
+    transactionsCreated: number;
+  };
+  endedBy: string;
+  timestamp: string;
 }
