@@ -16,6 +16,8 @@ import {
   UsersSearchResponse,
   CurrentUserResponse,
   EndEventResponse,
+  EndEventWithPricesData,
+  EndEventWithPricesResponse,
 } from "./types";
 
 // Events API
@@ -73,6 +75,19 @@ export const eventsApi = {
   endEvent: async (eventId: number): Promise<EndEventResponse> => {
     try {
       const response = await apiClient.post(`/events/${eventId}/end`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // End event with individual prices (admin only)
+  endEventWithPrices: async (
+    eventId: number,
+    data: EndEventWithPricesData
+  ): Promise<EndEventWithPricesResponse> => {
+    try {
+      const response = await apiClient.post(`/events/${eventId}/end`, data);
       return response.data;
     } catch (error) {
       throw handleApiError(error as AxiosError);

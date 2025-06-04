@@ -6,6 +6,7 @@ import { Event } from "@/lib/types";
 import RegistrationList from "@/components/RegistrationList";
 import EndEventDialog from "@/components/EndEventDialog";
 import EditEventDialog from "@/components/edit-event-dialog";
+import SetPriceDialog from "@/components/SetPriceDialog";
 
 type EventCardProps = {
   event: Event;
@@ -24,6 +25,7 @@ const EventCard = ({
   const [isRegistrationExpanded, setIsRegistrationExpanded] = useState(false);
   const [isEndDialogOpen, setIsEndDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSetPriceDialogOpen, setIsSetPriceDialogOpen] = useState(false);
 
   // Get current user to check admin status
   const { data: currentUserData } = useCurrentUser();
@@ -102,6 +104,14 @@ const EventCard = ({
                       className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
                     >
                       End Event
+                    </button>
+                  )}
+                  {event.isActive && (
+                    <button
+                      onClick={() => setIsSetPriceDialogOpen(true)}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
+                    >
+                      Set Price for group
                     </button>
                   )}
                 </div>
@@ -286,6 +296,13 @@ const EventCard = ({
         event={event}
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
+      />
+
+      {/* Set Price Dialog */}
+      <SetPriceDialog
+        event={event}
+        isOpen={isSetPriceDialogOpen}
+        onClose={() => setIsSetPriceDialogOpen(false)}
       />
     </>
   );

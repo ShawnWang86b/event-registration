@@ -269,3 +269,54 @@ export interface EndEventResponse {
   endedBy: string;
   timestamp: string;
 }
+
+// Individual Pricing End Event Types
+export interface UserPrice {
+  userId: string;
+  registrationId: number;
+  customPrice?: number;
+  useDefault: boolean;
+}
+
+export interface EndEventWithPricesData {
+  userPrices: UserPrice[];
+}
+
+export interface EndEventWithPricesResponse {
+  success: boolean;
+  event: {
+    id: number;
+    title: string;
+    defaultPrice: number;
+  };
+  deductionResults: {
+    userId: string;
+    userName: string;
+    previousBalance: number;
+    newBalance: number;
+    deducted: number;
+    transactionId: number;
+    priceUsed: number;
+    wentNegative: boolean;
+  }[];
+  negativeBalanceWarnings: {
+    userId: string;
+    userName: string;
+    previousBalance: number;
+    newBalance: number;
+    priceCharged: number;
+    deficit: number;
+  }[];
+  summary: {
+    totalAttendees: number;
+    successfulDeductions: number;
+    failedDeductions: number;
+    totalDeducted: number;
+    defaultPriceUsed: number;
+    customPriceUsed: number;
+    transactionsCreated: number;
+    usersWithNegativeBalance: number;
+  };
+  endedBy: string;
+  timestamp: string;
+}

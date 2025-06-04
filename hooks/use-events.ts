@@ -5,6 +5,7 @@ import {
   CreateEventData,
   UpdateEventData,
   EventsQueryParams,
+  EndEventWithPricesData,
 } from "@/lib/types";
 
 // Query keys
@@ -137,6 +138,39 @@ export const useToggleEventStatus = () => {
     },
     onError: (error: any) => {
       console.error("Failed to toggle event status:", error);
+    },
+  });
+};
+
+// End event with individual prices mutation (admin only)
+export const useEndEventWithPrices = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      data,
+    }: {
+      eventId: number;
+      data: EndEventWithPricesData;
+    }) => api.events.endEventWithPrices(eventId, data),
+    onSuccess: (result, { eventId }) => {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["admin"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+
+      // Log success with summary
+      console.log("Event ended successfully with individual prices:", {
+        eventId,
+        summary: result.summary,
+        customPricesUsed: result.summary.customPriceUsed,
+        totalCollected: result.summary.totalDeducted,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Failed to end event with individual prices:", error);
     },
   });
 };

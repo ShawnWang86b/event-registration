@@ -4,6 +4,13 @@ import { useUpdateEvent, useToggleEventStatus } from "@/hooks/use-events";
 import { EventFormData } from "@/lib/schemas";
 import { Event } from "@/lib/types";
 import EventForm from "./event-form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface EditEventDialogProps {
   event: Event;
@@ -63,43 +70,31 @@ export default function EditEventDialog({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Edit Event</h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Event ID: {event.id} • Status:{" "}
-                {event.isActive ? (
-                  <span className="text-green-600 font-medium">Active</span>
-                ) : (
-                  <span className="text-red-600 font-medium">Inactive</span>
-                )}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
-            >
-              ×
-            </button>
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit Event</DialogTitle>
+          <DialogDescription>
+            Event ID: {event.id} • Status:{" "}
+            {event.isActive ? (
+              <span className="text-green-600 font-medium">Active</span>
+            ) : (
+              <span className="text-red-600 font-medium">Inactive</span>
+            )}
+          </DialogDescription>
+        </DialogHeader>
 
-          <EventForm
-            event={event}
-            onSubmit={handleSubmit}
-            isLoading={
-              updateEventMutation.isPending || toggleStatusMutation.isPending
-            }
-            onCancel={onClose}
-            submitText="Update Event"
-          />
-        </div>
-      </div>
-    </div>
+        <EventForm
+          event={event}
+          onSubmit={handleSubmit}
+          isLoading={
+            updateEventMutation.isPending || toggleStatusMutation.isPending
+          }
+          onCancel={onClose}
+          submitText="Update Event"
+        />
+      </DialogContent>
+    </Dialog>
   );
 }

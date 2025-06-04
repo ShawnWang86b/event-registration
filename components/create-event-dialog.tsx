@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useCreateEvent } from "@/hooks/use-events";
 import { EventFormData } from "@/lib/schemas";
 import EventForm from "./event-form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface CreateEventDialogProps {
   isOpen: boolean;
@@ -35,32 +42,23 @@ export default function CreateEventDialog({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Create New Event
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
-            >
-              ×
-            </button>
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create New Event</DialogTitle>
+          <DialogDescription>
+            Fill out the form below to create a new event for registration.
+          </DialogDescription>
+        </DialogHeader>
 
-          <EventForm
-            onSubmit={handleSubmit}
-            isLoading={createEventMutation.isPending}
-            onCancel={onClose}
-            submitText="Create Event"
-          />
-        </div>
-      </div>
-    </div>
+        <EventForm
+          onSubmit={handleSubmit}
+          isLoading={createEventMutation.isPending}
+          onCancel={onClose}
+          submitText="Create Event"
+        />
+      </DialogContent>
+    </Dialog>
   );
 }
