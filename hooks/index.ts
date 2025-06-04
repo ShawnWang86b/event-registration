@@ -1,6 +1,9 @@
 // Export auth hooks
 export { useCurrentUser, authKeys } from "./use-auth";
 
+// Export user hooks
+export { useUserMonthlyReport, userKeys } from "./use-user";
+
 // Export all event hooks
 export {
   useEvents,
@@ -29,6 +32,8 @@ export {
   useTransactions,
   useTransaction,
   useRegistrationTransactions,
+  useCreditTransactions,
+  useCreateTransaction,
   transactionKeys,
 } from "./use-transactions";
 

@@ -18,6 +18,12 @@ import {
   EndEventResponse,
   EndEventWithPricesData,
   EndEventWithPricesResponse,
+  MonthlyReportResponse,
+  CreateMonthlyBalanceData,
+  CreateMonthlyBalanceResponse,
+  CreditTransactionsResponse,
+  CreateTransactionData,
+  CreditTransaction,
 } from "./types";
 
 // Events API
@@ -170,7 +176,33 @@ export const registrationsApi = {
 
 // Transactions API
 export const transactionsApi = {
-  // Get all transactions
+  // Get credit transactions for current user (or admin filtered)
+  getCreditTransactions: async (params?: {
+    limit?: number;
+    offset?: number;
+    eventId?: number;
+  }): Promise<CreditTransactionsResponse> => {
+    try {
+      const response = await apiClient.get("/transactions", { params });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Create new transaction (deposit or spend)
+  createTransaction: async (
+    data: CreateTransactionData
+  ): Promise<CreditTransaction> => {
+    try {
+      const response = await apiClient.post("/transactions", data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Get all transactions (legacy - keeping for compatibility)
   getTransactions: async (): Promise<Transaction[]> => {
     try {
       const response = await apiClient.get("/transactions");
@@ -180,7 +212,7 @@ export const transactionsApi = {
     }
   },
 
-  // Get transaction by ID
+  // Get transaction by ID (legacy - keeping for compatibility)
   getTransaction: async (id: number): Promise<Transaction> => {
     try {
       const response = await apiClient.get(`/transactions/${id}`);
@@ -190,7 +222,7 @@ export const transactionsApi = {
     }
   },
 
-  // Get transactions for a registration
+  // Get transactions for a registration (legacy - keeping for compatibility)
   getRegistrationTransactions: async (
     registrationId: number
   ): Promise<Transaction[]> => {
@@ -243,6 +275,43 @@ export const adminApi = {
       throw handleApiError(error as AxiosError);
     }
   },
+
+  // Generate monthly report for a user
+  generateMonthlyReport: async (
+    userId: string,
+    year?: number,
+    month?: number
+  ): Promise<MonthlyReportResponse> => {
+    try {
+      const params: Record<string, string> = {};
+      if (year) params.year = year.toString();
+      if (month) params.month = month.toString();
+
+      const response = await apiClient.get(
+        `/admin/users/${userId}/monthly-report`,
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Create/update monthly balance record
+  createMonthlyBalance: async (
+    userId: string,
+    data: CreateMonthlyBalanceData
+  ): Promise<CreateMonthlyBalanceResponse> => {
+    try {
+      const response = await apiClient.post(
+        `/admin/users/${userId}/monthly-report`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
 };
 
 // Auth API
@@ -251,6 +320,23 @@ export const authApi = {
   getCurrentUser: async (): Promise<CurrentUserResponse> => {
     try {
       const response = await apiClient.get("/auth/me");
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Generate monthly report for current user
+  generateUserMonthlyReport: async (
+    year?: number,
+    month?: number
+  ): Promise<MonthlyReportResponse> => {
+    try {
+      const params: Record<string, string> = {};
+      if (year) params.year = year.toString();
+      if (month) params.month = month.toString();
+
+      const response = await apiClient.get("/user/monthly-report", { params });
       return response.data;
     } catch (error) {
       throw handleApiError(error as AxiosError);

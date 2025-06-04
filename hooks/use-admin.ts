@@ -1,6 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-services";
-import { BalanceAdjustmentData } from "@/lib/types";
+import {
+  UserBalanceInfo,
+  UsersSearchResponse,
+  BalanceAdjustmentData,
+  MonthlyReportResponse,
+  CreateMonthlyBalanceData,
+} from "@/lib/types";
 
 // Query keys
 export const adminKeys = {
@@ -79,6 +85,55 @@ export const useAdjustUserBalance = () => {
     },
     onError: (error: any) => {
       console.error("Failed to adjust user balance:", error);
+    },
+  });
+};
+
+// Generate monthly report query
+export const useMonthlyReport = (
+  userId: string,
+  year?: number,
+  month?: number,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: ["admin", "monthly-report", userId, year, month],
+    queryFn: () => api.admin.generateMonthlyReport(userId, year, month),
+    enabled: enabled && !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Create monthly balance record mutation
+export const useCreateMonthlyBalance = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      data,
+    }: {
+      userId: string;
+      data: CreateMonthlyBalanceData;
+    }) => api.admin.createMonthlyBalance(userId, data),
+    onSuccess: (result, { userId, data }) => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "monthly-report", userId, data.year, data.month],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "balance", userId],
+      });
+
+      console.log("Monthly balance record created/updated:", {
+        userId,
+        year: data.year,
+        month: data.month,
+        closingBalance: result.summary.closingBalance,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Failed to create monthly balance record:", error);
     },
   });
 };
