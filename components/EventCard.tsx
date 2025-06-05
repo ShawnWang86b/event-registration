@@ -7,6 +7,13 @@ import RegistrationList from "@/components/RegistrationList";
 import EndEventDialog from "@/components/EndEventDialog";
 import EditEventDialog from "@/components/edit-event-dialog";
 import SetPriceDialog from "@/components/SetPriceDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type EventCardProps = {
   event: Event;
@@ -42,7 +49,7 @@ const EventCard = ({
     if (onRegister && !isRegistrationExpanded) {
       onRegister(event.id);
     }
-    // Toggle the registration section
+    // Toggle the registration popup
     setIsRegistrationExpanded(!isRegistrationExpanded);
   };
 
@@ -67,7 +74,7 @@ const EventCard = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden">
         {/* Header with close button when externally expanded */}
         {externalExpanded && (
           <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-blue-50">
@@ -222,12 +229,12 @@ const EventCard = ({
             </div>
           </div>
 
-          {/* Expand Details button - similar to the design */}
+          {/* Register button */}
           <div className="mt-4 pt-4 border-t border-gray-200">
             <button
               onClick={handleRegisterClick}
               disabled={loading || !!error}
-              className="w-full flex items-center justify-between bg-gray-50 hover:bg-gray-100 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors border border-gray-200"
+              className="w-full flex items-center justify-between bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 font-medium py-2 px-4 rounded-md border border-gray-300 hover:border-gray-400 transition-colors"
             >
               <span>
                 {loading
@@ -237,9 +244,7 @@ const EventCard = ({
                   : "Register for this event"}
               </span>
               <svg
-                className={`w-5 h-5 transition-transform duration-200 ${
-                  isRegistrationExpanded ? "rotate-180" : ""
-                }`}
+                className="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -248,7 +253,7 @@ const EventCard = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
+                  d="M9 5l7 7-7 7"
                 />
               </svg>
             </button>
@@ -263,26 +268,58 @@ const EventCard = ({
             </div>
           )}
         </div>
+      </div>
 
-        {/* Expandable Registration Section */}
-        <div
-          className={`transition-all duration-300 ease-in-out overflow-hidden ${
-            isRegistrationExpanded
-              ? "max-h-[2000px] opacity-100"
-              : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="border-t border-gray-200 bg-gray-50">
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                Event Registration
+      {/* Registration Details Dialog */}
+      <Dialog
+        open={isRegistrationExpanded}
+        onOpenChange={setIsRegistrationExpanded}
+      >
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{event.title}</DialogTitle>
+            <DialogDescription>Event Registration Details</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 p-3 rounded border">
+                <h3 className="font-medium text-gray-900 text-sm mb-1">
+                  Event Date
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {new Date(event.startDate).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded border">
+                <h3 className="font-medium text-gray-900 text-sm mb-1">
+                  Price
+                </h3>
+                <p className="text-gray-600 text-sm font-medium">
+                  ${parseFloat(event.price).toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            {event.location && (
+              <div className="bg-gray-50 p-3 rounded border">
+                <h3 className="font-medium text-gray-900 text-sm mb-1">
+                  Location
+                </h3>
+                <p className="text-gray-600 text-sm">{event.location}</p>
+              </div>
+            )}
+
+            {/* Registration List */}
+            <div className="border rounded-md p-3">
+              <h3 className="text-sm font-medium text-gray-900 mb-3">
+                Event Registrations
               </h3>
               <RegistrationList eventId={event.id} isInline={true} />
             </div>
           </div>
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
 
       {/* End Event Dialog */}
       <EndEventDialog
