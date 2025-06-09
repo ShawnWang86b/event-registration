@@ -5,6 +5,7 @@ import {
   useCancelEventRegistration,
 } from "@/hooks/use-registrations";
 import React from "react";
+import { Trash2, UserRoundCheck } from "lucide-react";
 
 interface RegistrationListProps {
   eventId: number;
@@ -113,7 +114,13 @@ const RegistrationList = ({
   );
 
   return (
-    <div className={isInline ? "" : "bg-white rounded-lg shadow-md p-6"}>
+    <div
+      className={
+        isInline
+          ? ""
+          : "bg-white rounded-lg shadow-md p-6 max-w-4xl w-full mx-auto"
+      }
+    >
       {/* Header - only show for standalone view */}
       {!isInline && (
         <div className="flex justify-between items-center mb-6">
@@ -134,9 +141,8 @@ const RegistrationList = ({
           <button
             onClick={handleJoinEvent}
             disabled={registering || !userId}
-            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-colors w-full justify-center text-lg"
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-medium py-2 px-6 rounded-lg transition-colors w-full justify-center"
           >
-            <span className="text-xl">+</span>
             {!userId
               ? "Sign in to join"
               : registering
@@ -156,47 +162,22 @@ const RegistrationList = ({
       {/* User Status */}
       {isUserRegistered && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="text-green-800 font-medium text-center">
-            ✅ You are registered for this event!
+          <div className="text-green-800 flex items-center gap-2">
+            <UserRoundCheck size={16} />
+            <span className="text-sm font-medium">
+              You are registered for this event!
+            </span>
           </div>
         </div>
       )}
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-blue-600">
-            {data.summary.registeredCount}
-          </div>
-          <div className="text-sm text-gray-600">Registered</div>
-        </div>
-        <div className="bg-yellow-50 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-yellow-600">
-            {data.summary.waitlistCount}
-          </div>
-          <div className="text-sm text-gray-600">Waitlist</div>
-        </div>
-        <div className="bg-green-50 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-green-600">
-            {data.summary.availableSpots}
-          </div>
-          <div className="text-sm text-gray-600">Available</div>
-        </div>
-        <div className="bg-gray-50 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-gray-600">
-            {data.summary.totalRegistrations}
-          </div>
-          <div className="text-sm text-gray-600">Total</div>
-        </div>
-      </div>
-
       {/* Registered Users */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        <h3 className="text-sm mb-3">
           Registered Attendees ({registeredUsers.length})
         </h3>
         {registeredUsers.length > 0 ? (
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
             {registeredUsers.map((registration, index) => (
               <div
                 key={registration.id}
@@ -209,32 +190,25 @@ const RegistrationList = ({
                   <div>
                     <div className="font-medium text-gray-800">
                       {registration.user.name}
-                      {registration.userId === userId && (
-                        <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                          You
-                        </span>
-                      )}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 hidden lg:block">
                       {registration.user.email}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-sm text-gray-500">
-                    {new Date(
-                      registration.registrationDate
-                    ).toLocaleDateString()}
-                  </div>
+                <div>
                   {registration.userId === userId && (
                     <button
                       onClick={handleCancelRegistration}
                       disabled={cancelRegistrationMutation.isPending}
-                      className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white text-xs px-3 py-1 rounded-full transition-colors"
+                      className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white p-2 rounded-full transition-colors"
+                      title={
+                        cancelRegistrationMutation.isPending
+                          ? "Canceling..."
+                          : "Cancel registration"
+                      }
                     >
-                      {cancelRegistrationMutation.isPending
-                        ? "Canceling..."
-                        : "Cancel"}
+                      <Trash2 size={16} />
                     </button>
                   )}
                 </div>
@@ -273,7 +247,7 @@ const RegistrationList = ({
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 hidden lg:block">
                       {registration.user.email}
                     </div>
                   </div>
@@ -288,11 +262,14 @@ const RegistrationList = ({
                     <button
                       onClick={handleCancelRegistration}
                       disabled={cancelRegistrationMutation.isPending}
-                      className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white text-xs px-3 py-1 rounded-full transition-colors"
+                      className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white p-2 rounded-full transition-colors"
+                      title={
+                        cancelRegistrationMutation.isPending
+                          ? "Canceling..."
+                          : "Cancel registration"
+                      }
                     >
-                      {cancelRegistrationMutation.isPending
-                        ? "Canceling..."
-                        : "Cancel"}
+                      <Trash2 size={16} />
                     </button>
                   )}
                 </div>

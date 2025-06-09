@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useCurrentUser } from "@/hooks";
@@ -48,11 +49,21 @@ export function AppSidebar() {
   const { data: currentUserData } = useCurrentUser();
   const currentUser = currentUserData?.user;
 
+  // Get sidebar state and controls
+  const { setOpenMobile, isMobile } = useSidebar();
+
   // Check if user is admin
   const isAdmin = currentUser?.role === "admin";
 
   // Combine menu items based on user role
   const menuItems = isAdmin ? [...baseItems, ...adminItems] : baseItems;
+
+  // Handle navigation click - close mobile sidebar
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar>
@@ -64,7 +75,7 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={handleNavClick}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>

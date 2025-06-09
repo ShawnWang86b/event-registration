@@ -1,22 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Calendar,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  FileText,
-  History,
-} from "lucide-react";
+import { History } from "lucide-react";
 import {
   useCurrentUser,
   useUserMonthlyReport,
   useCreditTransactions,
 } from "@/hooks";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -24,23 +14,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MonthlyAnalysis from "@/components/monthly-analysis";
+import CalorieChart from "@/components/calorie-chart";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const AccountPage = () => {
-  const currentDate = new Date();
+  const currentDate = useMemo(() => new Date(), []);
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(
     currentDate.getMonth() + 1
   );
+
+  const { state } = useSidebar();
 
   // Get current user data
   const { data: currentUserData, isLoading: userLoading } = useCurrentUser();
@@ -153,8 +138,14 @@ const AccountPage = () => {
 
   return (
     <div
-      className="container mx-auto p-6"
-      style={{ width: "calc(100vw - var(--sidebar-width))" }}
+      className="container mx-auto p-6 w-full lg:w-auto"
+      style={
+        typeof window !== "undefined" && window.innerWidth >= 1024
+          ? state === "collapsed"
+            ? { width: "100vw" }
+            : { width: "calc(100vw - var(--sidebar-width))" }
+          : {}
+      }
     >
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
@@ -173,7 +164,7 @@ const AccountPage = () => {
               <TabsTrigger value="transactions">
                 Recent Transactions
               </TabsTrigger>
-              <TabsTrigger value="reports">Monthly Reports</TabsTrigger>
+              <TabsTrigger value="reports">Calorie Consumption</TabsTrigger>
             </TabsList>
 
             {/* Transactions Tab */}
@@ -207,11 +198,11 @@ const AccountPage = () => {
                         return (
                           <div
                             key={transaction.id}
-                            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                            className="flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
                           >
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium">
+                                <span className="text-sm lg:text-base pb-2 lg:pb-0 font-medium">
                                   {transaction.description}
                                 </span>
                               </div>
@@ -227,19 +218,17 @@ const AccountPage = () => {
                                     minute: "2-digit",
                                   })}
                                 </span>
-                                {transaction.event && (
-                                  <span className="text-blue-600">
-                                    Event: {transaction.event.title}
-                                  </span>
-                                )}
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div
-                                className={`font-semibold ${amountInfo.color}`}
-                              >
-                                {amountInfo.sign}
-                                {amountInfo.amount}
+                            <div className="text-left lg:text-right py-2 lg:py-0">
+                              <div className="text-sm text-gray-600">
+                                Amount:{" "}
+                                <span
+                                  className={`font-semibold ${amountInfo.color}`}
+                                >
+                                  {amountInfo.sign}
+                                  {amountInfo.amount}
+                                </span>
                               </div>
                               <div className="text-sm text-gray-600">
                                 Balance:{" "}
@@ -259,18 +248,7 @@ const AccountPage = () => {
 
             {/* Monthly Reports Tab */}
             <TabsContent value="reports" className="space-y-6">
-              <MonthlyAnalysis
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                setSelectedMonth={setSelectedMonth}
-                setSelectedYear={setSelectedYear}
-                monthOptions={monthOptions}
-                yearOptions={yearOptions}
-                reportLoading={reportLoading}
-                reportError={reportError}
-                monthlyReport={monthlyReport}
-                formatCurrency={formatCurrency}
-              />
+              <CalorieChart />
             </TabsContent>
           </Tabs>
         </div>

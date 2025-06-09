@@ -3,10 +3,9 @@ import Image from "next/image";
 import { useEventRegistrations } from "@/hooks/use-registrations";
 import { useCurrentUser } from "@/hooks";
 import { Event } from "@/lib/types";
-import RegistrationList from "@/components/RegistrationList";
-import EndEventDialog from "@/components/EndEventDialog";
+import RegistrationList from "@/components/registration-list";
 import EditEventDialog from "@/components/edit-event-dialog";
-import SetPriceDialog from "@/components/SetPriceDialog";
+import SetPriceDialog from "@/components/set-price-dialog";
 import {
   Dialog,
   DialogContent,
@@ -74,7 +73,7 @@ const EventCard = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         {/* Header with close button when externally expanded */}
         {externalExpanded && (
           <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-blue-50">
@@ -95,30 +94,23 @@ const EventCard = ({
           {isAdmin && (
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center justify-between">
-                <div className="flex items-center text-blue-700">
+                <div className="flex items-center text-blue-800">
                   <span className="text-sm font-medium">Admin Actions:</span>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsEditDialogOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
+                    className="bg-blue-800 hover:bg-blue-900 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
                   >
                     Edit
                   </button>
-                  {event.isActive && (
-                    <button
-                      onClick={() => setIsEndDialogOpen(true)}
-                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
-                    >
-                      End Event
-                    </button>
-                  )}
+
                   {event.isActive && (
                     <button
                       onClick={() => setIsSetPriceDialogOpen(true)}
                       className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
                     >
-                      Set Price for group
+                      Set Price
                     </button>
                   )}
                 </div>
@@ -126,8 +118,8 @@ const EventCard = ({
             </div>
           )}
 
-          {/* Event Image with Title and Description Overlay */}
-          <div className="relative mb-6 h-48 rounded-lg overflow-hidden">
+          {/* Event Image with Title and Description Overlay - Large screens only */}
+          <div className="relative mb-6 h-48 rounded-lg overflow-hidden hidden lg:block">
             <Image
               src={getLocationImage(event.location)}
               alt={event.location || "Event location"}
@@ -142,6 +134,16 @@ const EventCard = ({
                 {event.description}
               </p>
             </div>
+          </div>
+
+          {/* Event Title and Description - Mobile only */}
+          <div className="mb-6 lg:hidden">
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">
+              {event.title}
+            </h2>
+            <p className="text-gray-600 text-sm line-clamp-3">
+              {event.description}
+            </p>
           </div>
 
           {/* Event ended notice */}
@@ -199,7 +201,7 @@ const EventCard = ({
               ) : registrationStatus ? (
                 <span
                   className={`font-semibold ${
-                    isEventFull ? "text-red-600" : "text-blue-600"
+                    isEventFull ? "text-red-600" : "text-blue-800"
                   }`}
                 >
                   {registrationStatus.registrationStatus}
@@ -210,12 +212,12 @@ const EventCard = ({
               )}
             </div>
 
-            {event.isPeriodic && event.frequency && (
-              <div className="flex justify-between">
-                <span className="font-medium">Frequency:</span>
-                <span className="capitalize">{event.frequency}</span>
-              </div>
-            )}
+            <div className="flex justify-between">
+              <span className="font-medium">Frequency:</span>
+              <span className="capitalize">
+                {event.frequency ? event.frequency : "one time"}
+              </span>
+            </div>
 
             <div className="flex justify-between">
               <span className="font-medium">Status:</span>
@@ -234,7 +236,7 @@ const EventCard = ({
             <button
               onClick={handleRegisterClick}
               disabled={loading || !!error}
-              className="w-full flex items-center justify-between bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 font-medium py-2 px-4 rounded-md border border-gray-300 hover:border-gray-400 transition-colors"
+              className="w-full flex items-center justify-between bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 font-medium py-2 px-4 rounded-md border border-gray-300 hover:border-gray-400 hover:cursor-pointer transition-colors"
             >
               <span>
                 {loading
@@ -275,28 +277,35 @@ const EventCard = ({
         open={isRegistrationExpanded}
         onOpenChange={setIsRegistrationExpanded}
       >
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
             <DialogDescription>Event Registration Details</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-gray-50 p-3 rounded border">
-                <h3 className="font-medium text-gray-900 text-sm mb-1">
-                  Event Date
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  {new Date(event.startDate).toLocaleDateString()}
+                <h3 className="font-medium text-gray-900 text-sm mb-1">Date</h3>
+                <p className="text-gray-600 text-sm font-medium">
+                  {new Date(event.startDate).toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </p>
               </div>
               <div className="bg-gray-50 p-3 rounded border">
                 <h3 className="font-medium text-gray-900 text-sm mb-1">
-                  Price
+                  Start Time
                 </h3>
                 <p className="text-gray-600 text-sm font-medium">
-                  ${parseFloat(event.price).toFixed(2)}
+                  {new Date(event.startDate).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
                 </p>
               </div>
             </div>
@@ -320,13 +329,6 @@ const EventCard = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* End Event Dialog */}
-      <EndEventDialog
-        event={event}
-        isOpen={isEndDialogOpen}
-        onClose={() => setIsEndDialogOpen(false)}
-      />
 
       {/* Edit Event Dialog */}
       <EditEventDialog

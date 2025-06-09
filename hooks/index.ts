@@ -45,5 +45,9 @@ export {
   adminKeys,
 } from "./use-admin";
 
+export { useAdminUsers } from "./use-admin-users";
+
+export { useCalorieData } from "./use-calorie-data";
+
 // Export existing hooks
 export { useIsMobile } from "./use-mobile";

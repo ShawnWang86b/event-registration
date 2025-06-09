@@ -79,7 +79,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
     },
   });
 
-  // Reset form when registration data changes (without form in dependencies)
+  // Reset form when registration data changes
   React.useEffect(() => {
     if (registeredUsers.length > 0) {
       const userPrices = registeredUsers.map((registration) => ({
@@ -93,7 +93,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
         userPrices,
       });
     }
-  }, [registeredUsers, defaultPrice]); // Removed 'form' from dependencies
+  }, [registeredUsers, defaultPrice, form]);
 
   const handleStepOne = () => {
     // Debug: Log current form data when moving to step 2
@@ -288,9 +288,9 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
+          <DialogTitle className="flex flex-col lg:flex-row items-center gap-3">
             {currentStep === 1 ? "Set Individual Prices" : "Confirm End Event"}
             <div className="flex items-center gap-2">
               <Badge variant={currentStep === 1 ? "default" : "secondary"}>
@@ -305,7 +305,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
             {currentStep === 1 ? (
               <>
                 Set custom prices for each registered user. Default price:
-                <span className="text-blue-500 font-bold">
+                <span className="text-blue-800 font-bold">
                   $ {defaultPrice.toFixed(2)}
                 </span>
               </>
@@ -322,19 +322,19 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleStepOne)}
-              className="flex flex-col flex-1"
+              className="flex flex-col flex-1 min-h-0"
             >
-              <div className="flex-1 space-y-4 pr-2 overflow-y-auto">
+              <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2">
                 {registeredUsers.map((registration, index) => (
                   <div
                     key={registration.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg"
+                    className="flex flex-col lg:flex-row items-start lg:items-center p-4 bg-gray-50 border border-gray-200 rounded-lg"
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                    <div className="flex items-center gap-3 pb-4 lg:pb-0">
+                      <div className="w-8 h-8 bg-blue-800 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
                         {index + 1}
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="">
                         <div className="font-medium text-gray-800 truncate">
                           {registration.user.name}
                         </div>
@@ -349,7 +349,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                         control={form.control}
                         name={`userPrices.${index}.useDefault`}
                         render={({ field }) => (
-                          <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormItem className="flex items-center space-x-2 space-y-0 pl-2">
                             <FormControl>
                               <input
                                 type="checkbox"
@@ -364,7 +364,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                                     );
                                   }
                                 }}
-                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                className="w-4 h-4 text-blue-800 bg-gray-100 border-gray-300 rounded focus:ring-blue-800"
                               />
                             </FormControl>
                             <FormLabel className="text-sm font-normal">
@@ -436,7 +436,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                 ))}
               </div>
 
-              <DialogFooter className="mt-6 pt-4 border-t">
+              <DialogFooter className="mt-4 pt-4 border-t flex-shrink-0">
                 <Button
                   type="button"
                   variant="outline"
@@ -445,7 +445,11 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-blue-800 text-white hover:bg-blue-900 hover:cursor-pointer"
+                >
                   Next: Review & Confirm
                 </Button>
               </DialogFooter>
@@ -453,8 +457,8 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
           </Form>
         ) : (
           // Step 2: Confirmation
-          <div className="flex flex-col flex-1">
-            <div className="flex-1 space-y-4 pr-2 overflow-y-auto">
+          <div className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                 <h3 className="font-semibold text-yellow-800 mb-2">
                   Pricing Summary
@@ -504,7 +508,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                     className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                      <div className="w-8 h-8 bg-blue-800 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -520,7 +524,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                     <div className="flex items-center gap-4 flex-shrink-0">
                       <div className="text-right">
                         <div
-                          className={`font-bold text-lg ${
+                          className={`font-bold ${
                             userPrice.isModified
                               ? "text-red-600"
                               : "text-gray-800"
@@ -528,18 +532,6 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                         >
                           ${userPrice.finalPrice.toFixed(2)}
                         </div>
-                        {userPrice.isModified ? (
-                          <Badge
-                            variant="destructive"
-                            className="text-xs text-white"
-                          >
-                            Modified
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="text-xs">
-                            Default
-                          </Badge>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -547,19 +539,19 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
               )}
             </div>
 
-            <DialogFooter className="mt-6 pt-4 border-t">
+            <DialogFooter className="mt-4 pt-4 border-t flex-shrink-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleStepBack}
                 disabled={isLoading}
               >
-                ← Step Back
+                Step Back
               </Button>
               <Button
                 onClick={handleConfirmEndEvent}
                 disabled={isLoading}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-blue-800 hover:bg-blue-900 hover:cursor-pointer"
               >
                 {isLoading ? "Ending Event..." : "Confirm End Event"}
               </Button>

@@ -5,6 +5,33 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventFormSchema, EventFormData } from "@/lib/schemas";
 import { Event } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { ChevronDownIcon } from "lucide-react";
 
 interface EventFormProps {
   event?: Event;
@@ -22,6 +49,24 @@ export default function EventForm({
   submitText = "Save Event",
 }: EventFormProps) {
   const [isPeriodic, setIsPeriodic] = useState(event?.isPeriodic || false);
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    event?.startDate ? new Date(event.startDate) : undefined
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    event?.endDate ? new Date(event.endDate) : undefined
+  );
+  const [startTime, setStartTime] = useState(
+    event?.startDate
+      ? new Date(event.startDate).toTimeString().slice(0, 5)
+      : "10:00"
+  );
+  const [endTime, setEndTime] = useState(
+    event?.endDate
+      ? new Date(event.endDate).toTimeString().slice(0, 5)
+      : "12:00"
+  );
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
@@ -55,216 +100,385 @@ export default function EventForm({
     }
   };
 
+  const combineDateAndTime = (date: Date, time: string): string => {
+    const [hours, minutes] = time.split(":").map((num) => parseInt(num));
+    const combined = new Date(date);
+    combined.setHours(hours, minutes, 0, 0); // Set seconds and milliseconds to 0
+
+    // Format as YYYY-MM-DDTHH:MM for datetime-local input compatibility
+    const year = combined.getFullYear();
+    const month = String(combined.getMonth() + 1).padStart(2, "0");
+    const day = String(combined.getDate()).padStart(2, "0");
+    const hour = String(combined.getHours()).padStart(2, "0");
+    const minute = String(combined.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hour}:${minute}`;
+  };
+
+  const handleStartDateChange = (date: Date | undefined) => {
+    setStartDate(date);
+    if (date) {
+      const combined = combineDateAndTime(date, startTime);
+      form.setValue("startDate", combined);
+    }
+  };
+
+  const handleStartTimeChange = (time: string) => {
+    setStartTime(time);
+    if (startDate) {
+      const combined = combineDateAndTime(startDate, time);
+      form.setValue("startDate", combined);
+    }
+  };
+
+  const handleEndDateChange = (date: Date | undefined) => {
+    setEndDate(date);
+    if (date) {
+      const combined = combineDateAndTime(date, endTime);
+      form.setValue("endDate", combined);
+    }
+  };
+
+  const handleEndTimeChange = (time: string) => {
+    setEndTime(time);
+    if (endDate) {
+      const combined = combineDateAndTime(endDate, time);
+      form.setValue("endDate", combined);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        {/* Title */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-900">
-            Event Title *
-          </label>
-          <input
-            {...form.register("title")}
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter event title"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          {/* Title */}
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Event Title *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter event title" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.title && (
-            <p className="text-sm text-red-600">
-              {form.formState.errors.title.message}
-            </p>
-          )}
-        </div>
 
-        {/* Description */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-900">
-            Description *
-          </label>
-          <textarea
-            {...form.register("description")}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter event description"
+          {/* Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description *</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter event description"
+                    rows={4}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {form.formState.errors.description && (
-            <p className="text-sm text-red-600">
-              {form.formState.errors.description.message}
-            </p>
-          )}
-        </div>
 
-        {/* Price and Max Attendees Row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">
-              Price ($) *
-            </label>
-            <input
-              {...form.register("price", { valueAsNumber: true })}
-              type="number"
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="0.00"
+          {/* Price and Max Attendees Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price ($) *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={field.value || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Allow empty string or valid number input
+                        if (value === "" || !isNaN(Number(value))) {
+                          field.onChange(value === "" ? 0 : parseFloat(value));
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {form.formState.errors.price && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.price.message}
-              </p>
-            )}
+
+            <FormField
+              control={form.control}
+              name="maxAttendees"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Max Attendees *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="50"
+                      value={field.value || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Allow empty string or valid number input
+                        if (value === "" || !isNaN(Number(value))) {
+                          field.onChange(value === "" ? 1 : parseInt(value));
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">
-              Max Attendees *
-            </label>
-            <input
-              {...form.register("maxAttendees", { valueAsNumber: true })}
-              type="number"
-              min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="50"
-            />
-            {form.formState.errors.maxAttendees && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.maxAttendees.message}
-              </p>
-            )}
+          {/* Start Date and Time */}
+          <div className="space-y-4">
+            <FormLabel>Start Date & Time *</FormLabel>
+            <div className="flex gap-4">
+              <div className="flex flex-col gap-3">
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="px-1">Date</FormLabel>
+                      <Popover
+                        open={startDateOpen}
+                        onOpenChange={setStartDateOpen}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className="w-40 justify-between font-normal"
+                            >
+                              {startDate
+                                ? startDate.toLocaleDateString()
+                                : "Select date"}
+                              <ChevronDownIcon className="h-4 w-4" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto overflow-hidden p-0"
+                          align="start"
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={startDate}
+                            captionLayout="dropdown"
+                            onSelect={(date) => {
+                              handleStartDateChange(date);
+                              setStartDateOpen(false);
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <FormItem>
+                  <FormLabel className="px-1">Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => handleStartTimeChange(e.target.value)}
+                      className="w-32 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                    />
+                  </FormControl>
+                </FormItem>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Start Date and End Date Row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">
-              Start Date & Time *
-            </label>
-            <input
-              {...form.register("startDate")}
-              type="datetime-local"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {form.formState.errors.startDate && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.startDate.message}
-              </p>
-            )}
+          {/* End Date and Time */}
+          <div className="space-y-4">
+            <FormLabel>End Date & Time *</FormLabel>
+            <div className="flex gap-4">
+              <div className="flex flex-col gap-3">
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="px-1">Date</FormLabel>
+                      <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className="w-40 justify-between font-normal"
+                            >
+                              {endDate
+                                ? endDate.toLocaleDateString()
+                                : "Select date"}
+                              <ChevronDownIcon className="h-4 w-4" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto overflow-hidden p-0"
+                          align="start"
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={endDate}
+                            captionLayout="dropdown"
+                            onSelect={(date) => {
+                              handleEndDateChange(date);
+                              setEndDateOpen(false);
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <FormItem>
+                  <FormLabel className="px-1">Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => handleEndTimeChange(e.target.value)}
+                      className="w-32 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                    />
+                  </FormControl>
+                </FormItem>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">
-              End Date & Time *
-            </label>
-            <input
-              {...form.register("endDate")}
-              type="datetime-local"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {form.formState.errors.endDate && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.endDate.message}
-              </p>
+          {/* Location */}
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Location *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter event location" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Optional field for event venue or location details
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
             )}
-          </div>
-        </div>
-
-        {/* Location */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-900">Location</label>
-          <input
-            {...form.register("location")}
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter event location (optional)"
           />
-        </div>
 
-        {/* Periodic Event Toggle */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="isPeriodic"
-              checked={isPeriodic}
-              onChange={(e) => handlePeriodicChange(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label
-              htmlFor="isPeriodic"
-              className="text-sm font-medium text-gray-900"
-            >
-              Recurring Event
-            </label>
-          </div>
+          {/* Periodic Event Toggle */}
+          <FormField
+            control={form.control}
+            name="isPeriodic"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">Recurring Event</FormLabel>
+                  <FormDescription>
+                    Enable if this event repeats on a schedule
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      handlePeriodicChange(checked);
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
           {/* Frequency (only show if periodic) */}
           {isPeriodic && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-900">
-                Frequency *
-              </label>
-              <select
-                {...form.register("frequency")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select frequency</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
-              {form.formState.errors.frequency && (
-                <p className="text-sm text-red-600">
-                  {form.formState.errors.frequency.message}
-                </p>
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Frequency *</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
           )}
-        </div>
 
-        {/* Active Status Toggle (only show for editing existing events) */}
-        {event && (
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="isActive"
-                {...form.register("isActive")}
-                className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
-              />
-              <label
-                htmlFor="isActive"
-                className="text-sm font-medium text-gray-900"
-              >
-                Event Active
-              </label>
-            </div>
-            <p className="text-xs text-gray-500">
-              Inactive events won&apos;t appear in the public event list
-            </p>
-          </div>
-        )}
+          {/* Active Status Toggle (only show for editing existing events) */}
+          {event && (
+            <FormField
+              control={form.control}
+              name="isActive"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Event Active</FormLabel>
+                    <FormDescription>
+                      Inactive events won&apos;t appear in the public event list
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
 
-        {/* Form Actions */}
-        <div className="flex gap-3 pt-4">
-          {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          {/* Form Actions */}
+          <div className="flex justify-end gap-3 pt-4">
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            )}
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-blue-800 hover:bg-blue-900 text-white hover:cursor-pointer"
             >
-              Cancel
-            </button>
-          )}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            {isLoading ? "Saving..." : submitText}
-          </button>
-        </div>
-      </form>
+              {isLoading ? "Saving..." : submitText}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

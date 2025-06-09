@@ -4,6 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useCurrentUser } from "@/hooks";
+import LoadingSpinner from "@/components/loading-spinner";
 
 export default function AdminLayout({
   children,
@@ -31,11 +32,8 @@ export default function AdminLayout({
   // Show loading while checking permissions
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
-        </div>
+      <div className="fixed inset-0 flex justify-center items-center bg-gray-50 z-50">
+        <LoadingSpinner />
       </div>
     );
   }
