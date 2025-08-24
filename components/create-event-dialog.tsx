@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useCreateEvent } from "@/hooks/use-events";
 import { EventFormData } from "@/lib/schemas";
 import EventForm from "./event-form";
@@ -44,10 +43,12 @@ export default function CreateEventDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Event</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-card-foreground">
+            Create New Event
+          </DialogTitle>
+          <DialogDescription className="text-primary">
             Fill out the form below to create a new event for registration.
           </DialogDescription>
         </DialogHeader>

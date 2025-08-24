@@ -1,4 +1,4 @@
-import EventDisplay from "@/components/event-display";
+import EventDisplay from "@/components/EventDisplay";
 
 export default function EventsPage() {
   return <EventDisplay />;

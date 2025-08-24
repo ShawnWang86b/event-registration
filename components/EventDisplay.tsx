@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { CalendarPlus } from "lucide-react";
 import { useEvents } from "@/hooks/use-events";
 import { useCurrentUser } from "@/hooks";
-import EventCard from "@/components/event-card";
+import EventCard from "@/components/EventCard";
 import LoadingSpinner from "@/components/loading-spinner";
 import CreateEventDialog from "@/components/create-event-dialog";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -33,7 +33,7 @@ const EventDisplay = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-gray-50 z-50">
+      <div className="flex justify-center items-center min-h-[100vh] min-w-[80vw]">
         <LoadingSpinner />
       </div>
     );
@@ -55,51 +55,34 @@ const EventDisplay = () => {
     );
   }
 
-  // Calculate dynamic styles only on client-side
-  const getDynamicStyles = () => {
-    if (!isClient) return {};
-
-    if (window.innerWidth >= 1024) {
-      return state === "collapsed"
-        ? { width: "100vw" }
-        : { width: "calc(100vw - var(--sidebar-width))" };
-    }
-    return {};
-  };
-
   return (
-    <div
-      className="min-h-screen bg-gray-50 w-full lg:w-auto"
-      style={getDynamicStyles()}
-    >
-      <div className="container mx-auto p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-start justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Events</h1>
-              <p className="text-gray-600 mt-2">
-                Discover and register for upcoming basketball events
-              </p>
-            </div>
-
-            {/* Admin-only Create Event Button */}
-            {isAdmin && (
-              <button
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="flex items-center gap-2 bg-blue-800 hover:bg-blue-900 text-white font-sm p-4 rounded-full transition-colors hover:cursor-pointer"
-              >
-                <CalendarPlus size={16} />
-                {/* Create Event */}
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+    <div className="min-h-screen min-w-[80vw] lg:w-auto p-16">
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-secondary-foreground">
+            Events
+          </h1>
+          <p className="text-gray-600 text-lg mt-2">
+            Discover and register for upcoming basketball events
+          </p>
         </div>
+
+        {/* Admin-only Create Event Button */}
+        {isAdmin && (
+          <button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-sm p-4 rounded-full transition-colors hover:cursor-pointer"
+          >
+            <CalendarPlus size={16} />
+            {/* Create Event */}
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
       </div>
 
       {/* Create Event Dialog */}

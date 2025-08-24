@@ -141,7 +141,7 @@ const RegistrationList = ({
           <button
             onClick={handleJoinEvent}
             disabled={registering || !userId}
-            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-medium py-2 px-6 rounded-lg transition-colors w-full justify-center"
+            className="flex items-center gap-2 cursor-pointer bg-primary hover:bg-primary/90 disabled:bg-gray-400 text-primary-foreground py-2 px-6 rounded-lg transition-colors w-full justify-center"
           >
             {!userId
               ? "Sign in to join"
@@ -161,12 +161,10 @@ const RegistrationList = ({
 
       {/* User Status */}
       {isUserRegistered && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="text-green-800 flex items-center gap-2">
+        <div className="mb-6 p-4 bg-card border border-border rounded-lg">
+          <div className="text-card-foreground flex items-center gap-2">
             <UserRoundCheck size={16} />
-            <span className="text-sm font-medium">
-              You are registered for this event!
-            </span>
+            <span >You are registered for this event!</span>
           </div>
         </div>
       )}
@@ -181,17 +179,17 @@ const RegistrationList = ({
             {registeredUsers.map((registration, index) => (
               <div
                 key={registration.id}
-                className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
+                className="flex items-center justify-between p-3 bg-card border border-border rounded-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  <div className="w-8 h-8 bg-primary text-popover rounded-full flex items-center justify-center text-sm font-medium">
                     {index + 1}
                   </div>
                   <div>
-                    <div className="font-medium text-gray-800">
+                    <div className="font-medium text-card-foreground">
                       {registration.user.name}
                     </div>
-                    <div className="text-sm text-gray-600 hidden lg:block">
+                    <div className="text-sm text-primary hidden lg:block">
                       {registration.user.email}
                     </div>
                   </div>

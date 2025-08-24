@@ -1,6 +1,7 @@
 "use client";
 import { Calendar, Home, Shield, User } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Sidebar,
@@ -52,6 +53,9 @@ export function AppSidebar() {
   // Get sidebar state and controls
   const { setOpenMobile, isMobile } = useSidebar();
 
+  // Get current pathname for active route detection
+  const pathname = usePathname();
+
   // Check if user is admin
   const isAdmin = currentUser?.role === "admin";
 
@@ -65,6 +69,14 @@ export function AppSidebar() {
     }
   };
 
+  // Check if route is active
+  const isActiveRoute = (url: string) => {
+    if (url === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(url);
+  };
+
   return (
     <Sidebar>
       <SidebarContent className="flex flex-col justify-between p-4">
@@ -75,7 +87,15 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} onClick={handleNavClick}>
+                    <Link
+                      href={item.url}
+                      onClick={handleNavClick}
+                      className={`${
+                        isActiveRoute(item.url)
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : ""
+                      }`}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>

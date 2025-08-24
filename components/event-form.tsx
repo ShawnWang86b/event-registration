@@ -159,7 +159,7 @@ export default function EventForm({
               <FormItem>
                 <FormLabel>Event Title *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter event title" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -174,11 +174,7 @@ export default function EventForm({
               <FormItem>
                 <FormLabel>Description *</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="Enter event description"
-                    rows={4}
-                    {...field}
-                  />
+                  <Textarea rows={4} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -198,7 +194,6 @@ export default function EventForm({
                       type="number"
                       min="0"
                       step="0.01"
-                      placeholder="0.00"
                       value={field.value || ""}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -224,7 +219,6 @@ export default function EventForm({
                     <Input
                       type="number"
                       min="1"
-                      placeholder="50"
                       value={field.value || ""}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -243,7 +237,9 @@ export default function EventForm({
 
           {/* Start Date and Time */}
           <div className="space-y-4">
-            <FormLabel>Start Date & Time *</FormLabel>
+            <FormLabel className="text-card-foreground">
+              Start Date & Time *
+            </FormLabel>
             <div className="flex gap-4">
               <div className="flex flex-col gap-3">
                 <FormField
@@ -260,7 +256,7 @@ export default function EventForm({
                           <FormControl>
                             <Button
                               variant="outline"
-                              className="w-40 justify-between font-normal"
+                              className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
                             >
                               {startDate
                                 ? startDate.toLocaleDateString()
@@ -297,7 +293,7 @@ export default function EventForm({
                       type="time"
                       value={startTime}
                       onChange={(e) => handleStartTimeChange(e.target.value)}
-                      className="w-32 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                      className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                     />
                   </FormControl>
                 </FormItem>
@@ -321,7 +317,7 @@ export default function EventForm({
                           <FormControl>
                             <Button
                               variant="outline"
-                              className="w-40 justify-between font-normal"
+                              className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
                             >
                               {endDate
                                 ? endDate.toLocaleDateString()
@@ -358,7 +354,7 @@ export default function EventForm({
                       type="time"
                       value={endTime}
                       onChange={(e) => handleEndTimeChange(e.target.value)}
-                      className="w-32 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                      className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                     />
                   </FormControl>
                 </FormItem>
@@ -374,7 +370,7 @@ export default function EventForm({
               <FormItem>
                 <FormLabel>Location *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter event location" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormDescription>
                   Optional field for event venue or location details
@@ -389,7 +385,7 @@ export default function EventForm({
             control={form.control}
             name="isPeriodic"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border-input border p-4">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Recurring Event</FormLabel>
                   <FormDescription>
@@ -423,7 +419,7 @@ export default function EventForm({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select frequency" />
+                        <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -465,14 +461,19 @@ export default function EventForm({
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-4">
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="w-[120px] hover:cursor-pointer hover:bg-secondary/90"
+              >
                 Cancel
               </Button>
             )}
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-blue-800 hover:bg-blue-900 text-white hover:cursor-pointer"
+              className="w-[120px] bg-primary hover:bg-primary/90 text-primary-foreground hover:cursor-pointer"
             >
               {isLoading ? "Saving..." : submitText}
             </Button>

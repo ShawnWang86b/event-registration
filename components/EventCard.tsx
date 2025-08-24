@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEventRegistrations } from "@/hooks/use-registrations";
 import { useCurrentUser } from "@/hooks";
 import { Event } from "@/lib/types";
-import RegistrationList from "@/components/registration-list";
+import RegistrationList from "@/components/RegistrationList";
 import EditEventDialog from "@/components/edit-event-dialog";
 import SetPriceDialog from "@/components/set-price-dialog";
 import {
@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { MoveRight } from "lucide-react";
 
 type EventCardProps = {
   event: Event;
@@ -73,7 +74,7 @@ const EventCard = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-card rounded-lg border-border border overflow-hidden">
         {/* Header with close button when externally expanded */}
         {externalExpanded && (
           <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-blue-50">
@@ -94,13 +95,13 @@ const EventCard = ({
           {isAdmin && (
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center justify-between">
-                <div className="flex items-center text-blue-800">
+                <div className="flex items-center text-primary">
                   <span className="text-sm font-medium">Admin Actions:</span>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsEditDialogOpen(true)}
-                    className="bg-blue-800 hover:bg-blue-900 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
+                    className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-full transition-colors font-medium"
                   >
                     Edit
                   </button>
@@ -108,7 +109,7 @@ const EventCard = ({
                   {event.isActive && (
                     <button
                       onClick={() => setIsSetPriceDialogOpen(true)}
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
+                      className="cursor-pointer bg-secondary hover:bg-secondary/90 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
                     >
                       Set Price
                     </button>
@@ -126,11 +127,11 @@ const EventCard = ({
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 flex flex-col justify-end p-4">
-              <h2 className="text-xl font-semibold mb-2 text-white">
+            <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/60 to-transparent">
+              <h2 className="text-xl font-semibold mb-2 text-primary-foreground">
                 {event.title}
               </h2>
-              <p className="text-white text-sm line-clamp-3">
+              <p className="text-primary-foreground line-clamp-3">
                 {event.description}
               </p>
             </div>
@@ -155,21 +156,19 @@ const EventCard = ({
             </div>
           )}
 
-          <div className="space-y-2 text-sm text-gray-500">
+          <div className="space-y-2 text-card-foreground">
             <div className="flex justify-between">
-              <span className="font-medium">Price:</span>
-              <span className="text-green-600 font-semibold">
-                ${parseFloat(event.price).toFixed(2)}
-              </span>
+              <span>Price:</span>
+              <span>${parseFloat(event.price).toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="font-medium">Date:</span>
+              <span>Date:</span>
               <span>{new Date(event.startDate).toLocaleDateString()}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="font-medium">Time:</span>
+              <span>Time:</span>
               <span>
                 {new Date(event.startDate).toLocaleTimeString("en-US", {
                   hour: "2-digit",
@@ -187,43 +186,43 @@ const EventCard = ({
 
             {event.location && (
               <div className="flex justify-between">
-                <span className="font-medium">Location:</span>
+                <span>Location:</span>
                 <span>{event.location}</span>
               </div>
             )}
 
             <div className="flex justify-between">
-              <span className="font-medium">Registrations:</span>
+              <span>Registrations:</span>
               {loading ? (
-                <span className="text-gray-400">Loading...</span>
+                <span className="text-primary">Loading...</span>
               ) : error ? (
                 <span className="text-red-500">Error loading</span>
               ) : registrationStatus ? (
                 <span
                   className={`font-semibold ${
-                    isEventFull ? "text-red-600" : "text-blue-800"
+                    isEventFull ? "text-secondary" : "text-primary"
                   }`}
                 >
                   {registrationStatus.registrationStatus}
                   {isEventFull && " (Full)"}
                 </span>
               ) : (
-                <span className="text-gray-400">--</span>
+                <span className="text-primary">--</span>
               )}
             </div>
 
             <div className="flex justify-between">
-              <span className="font-medium">Frequency:</span>
+              <span>Frequency:</span>
               <span className="capitalize">
                 {event.frequency ? event.frequency : "one time"}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span className="font-medium">Status:</span>
+              <span>Status:</span>
               <span
                 className={`font-semibold ${
-                  event.isActive ? "text-green-600" : "text-red-600"
+                  event.isActive ? "text-primary" : "text-secondary"
                 }`}
               >
                 {event.isActive ? "Active" : "Ended"}
@@ -232,11 +231,11 @@ const EventCard = ({
           </div>
 
           {/* Register button */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-4 pt-4">
             <button
               onClick={handleRegisterClick}
               disabled={loading || !!error}
-              className="w-full flex items-center justify-between bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 font-medium py-2 px-4 rounded-md border border-gray-300 hover:border-gray-400 hover:cursor-pointer transition-colors"
+              className="text-lg w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-gray-100 disabled:cursor-not-allowed text-popover font-medium py-2 px-4 rounded-md border hover:cursor-pointer transition-colors"
             >
               <span>
                 {loading
@@ -245,19 +244,7 @@ const EventCard = ({
                   ? "View Event Details"
                   : "Register for this event"}
               </span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <MoveRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -280,15 +267,19 @@ const EventCard = ({
         <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
-            <DialogDescription>Event Registration Details</DialogDescription>
+            <DialogDescription className="text-card-foreground">
+              Event Registration Details
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="bg-gray-50 p-3 rounded border">
-                <h3 className="font-medium text-gray-900 text-sm mb-1">Date</h3>
-                <p className="text-gray-600 text-sm font-medium">
-                  {new Date(event.startDate).toLocaleDateString("en-US", {
+              <div className="bg-card p-3 rounded border">
+                <h3 className="font-semibold text-card-foreground text-sm mb-1">
+                  Date
+                </h3>
+                <p className="text-primary text-sm font-medium">
+                  {new Date(event.startDate).toLocaleDateString("en-AU", {
                     weekday: "long",
                     year: "numeric",
                     month: "short",
@@ -296,12 +287,12 @@ const EventCard = ({
                   })}
                 </p>
               </div>
-              <div className="bg-gray-50 p-3 rounded border">
-                <h3 className="font-medium text-gray-900 text-sm mb-1">
+              <div className="bg-card p-3 rounded border">
+                <h3 className="font-semibold text-card-foreground text-sm mb-1">
                   Start Time
                 </h3>
-                <p className="text-gray-600 text-sm font-medium">
-                  {new Date(event.startDate).toLocaleTimeString("en-US", {
+                <p className="text-primary text-sm font-medium">
+                  {new Date(event.startDate).toLocaleTimeString("en-AU", {
                     hour: "numeric",
                     minute: "2-digit",
                     hour12: true,
@@ -311,17 +302,17 @@ const EventCard = ({
             </div>
 
             {event.location && (
-              <div className="bg-gray-50 p-3 rounded border">
-                <h3 className="font-medium text-gray-900 text-sm mb-1">
+              <div className="bg-card p-3 rounded border">
+                <h3 className="font-semibold text-card-foreground text-sm mb-1">
                   Location
                 </h3>
-                <p className="text-gray-600 text-sm">{event.location}</p>
+                <p className="text-primary text-sm">{event.location}</p>
               </div>
             )}
 
             {/* Registration List */}
             <div className="border rounded-md p-3">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
+              <h3 className="text-sm font-medium text-foreground mb-3">
                 Event Registrations
               </h3>
               <RegistrationList eventId={event.id} isInline={true} />
