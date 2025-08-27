@@ -4,8 +4,8 @@ import { useEventRegistrations } from "@/hooks/use-registrations";
 import { useCurrentUser } from "@/hooks";
 import { Event } from "@/lib/types";
 import RegistrationList from "@/components/RegistrationList";
-import EditEventDialog from "@/components/edit-event-dialog";
-import SetPriceDialog from "@/components/set-price-dialog";
+import EditEventDialog from "@/components/EditEvent";
+import SetPriceDialog from "@/components/SetPrice";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { MoveRight } from "lucide-react";
+import {
+  formatDisplayDate,
+  formatDisplayTimeRange,
+  formatDisplayDateLong,
+  formatDisplayTime12Hour,
+} from "@/utils/dateTime";
 
 type EventCardProps = {
   event: Event;
@@ -78,7 +84,7 @@ const EventCard = ({
         {/* Header with close button when externally expanded */}
         {externalExpanded && (
           <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-blue-50">
-            <h3 className="text-lg font-semibold text-blue-800">
+            <h3 className="text-lg font-semibold text-primary">
               Event Details
             </h3>
             <button
@@ -164,23 +170,13 @@ const EventCard = ({
 
             <div className="flex justify-between">
               <span>Date:</span>
-              <span>{new Date(event.startDate).toLocaleDateString()}</span>
+              <span>{formatDisplayDate(event.startDate)}</span>
             </div>
 
             <div className="flex justify-between">
               <span>Time:</span>
               <span>
-                {new Date(event.startDate).toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}{" "}
-                -{" "}
-                {new Date(event.endDate).toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
+                {formatDisplayTimeRange(event.startDate, event.endDate)}
               </span>
             </div>
 
@@ -279,12 +275,7 @@ const EventCard = ({
                   Date
                 </h3>
                 <p className="text-primary text-sm font-medium">
-                  {new Date(event.startDate).toLocaleDateString("en-AU", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {formatDisplayDateLong(event.startDate)}
                 </p>
               </div>
               <div className="bg-card p-3 rounded border">
@@ -292,11 +283,7 @@ const EventCard = ({
                   Start Time
                 </h3>
                 <p className="text-primary text-sm font-medium">
-                  {new Date(event.startDate).toLocaleTimeString("en-AU", {
-                    hour: "numeric",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
+                  {formatDisplayTime12Hour(event.startDate)}
                 </p>
               </div>
             </div>

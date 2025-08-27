@@ -32,7 +32,7 @@ export default function AdminLayout({
   // Show loading while checking permissions
   if (isLoading) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-gray-50 z-50">
+      <div className="flex justify-center items-center min-h-[100vh] min-w-[80vw]">
         <LoadingSpinner />
       </div>
     );

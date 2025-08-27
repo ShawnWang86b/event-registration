@@ -21,6 +21,18 @@ export const eventFormSchema = z
     (data) => {
       const startDate = new Date(data.startDate);
       const endDate = new Date(data.endDate);
+
+      // Debug logging
+      console.log("Schema validation debug:", {
+        startDateRaw: data.startDate,
+        endDateRaw: data.endDate,
+        startDateParsed: startDate,
+        endDateParsed: endDate,
+        startDateValid: !isNaN(startDate.getTime()),
+        endDateValid: !isNaN(endDate.getTime()),
+        comparison: endDate > startDate,
+      });
+
       return endDate > startDate;
     },
     {

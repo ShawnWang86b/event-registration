@@ -32,14 +32,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ChevronDownIcon } from "lucide-react";
+import {
+  formatDateTimeLocal,
+  parseDateTimeLocal,
+  updateDateTimeDate,
+  updateDateTimeTime,
+  formatDisplayDate,
+  formatDisplayTime,
+} from "@/utils/dateTime";
 
-interface EventFormProps {
+type EventFormProps = {
   event?: Event;
   onSubmit: (data: EventFormData) => Promise<void>;
   isLoading?: boolean;
   onCancel?: () => void;
   submitText?: string;
-}
+};
 
 export default function EventForm({
   event,
@@ -48,25 +56,8 @@ export default function EventForm({
   onCancel,
   submitText = "Save Event",
 }: EventFormProps) {
-  const [isPeriodic, setIsPeriodic] = useState(event?.isPeriodic || false);
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(
-    event?.startDate ? new Date(event.startDate) : undefined
-  );
-  const [endDate, setEndDate] = useState<Date | undefined>(
-    event?.endDate ? new Date(event.endDate) : undefined
-  );
-  const [startTime, setStartTime] = useState(
-    event?.startDate
-      ? new Date(event.startDate).toTimeString().slice(0, 5)
-      : "10:00"
-  );
-  const [endTime, setEndTime] = useState(
-    event?.endDate
-      ? new Date(event.endDate).toTimeString().slice(0, 5)
-      : "12:00"
-  );
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
@@ -74,12 +65,8 @@ export default function EventForm({
       title: event?.title || "",
       description: event?.description || "",
       price: event?.price ? parseFloat(event.price) : 0,
-      startDate: event?.startDate
-        ? new Date(event.startDate).toISOString().slice(0, 16)
-        : "",
-      endDate: event?.endDate
-        ? new Date(event.endDate).toISOString().slice(0, 16)
-        : "",
+      startDate: event?.startDate ? formatDateTimeLocal(event.startDate) : "",
+      endDate: event?.endDate ? formatDateTimeLocal(event.endDate) : "",
       location: event?.location || "",
       isPeriodic: event?.isPeriodic || false,
       frequency: event?.frequency || "",
@@ -89,63 +76,24 @@ export default function EventForm({
   });
 
   const handleSubmit: SubmitHandler<EventFormData> = async (data) => {
-    await onSubmit(data);
+    // Convert datetime-local strings to UTC ISO strings
+    const processedData = {
+      ...data,
+      startDate: data.startDate ? parseDateTimeLocal(data.startDate) : "",
+      endDate: data.endDate ? parseDateTimeLocal(data.endDate) : "",
+    };
+    await onSubmit(processedData);
   };
 
   const handlePeriodicChange = (checked: boolean) => {
-    setIsPeriodic(checked);
     form.setValue("isPeriodic", checked);
     if (!checked) {
       form.setValue("frequency", "");
     }
   };
 
-  const combineDateAndTime = (date: Date, time: string): string => {
-    const [hours, minutes] = time.split(":").map((num) => parseInt(num));
-    const combined = new Date(date);
-    combined.setHours(hours, minutes, 0, 0); // Set seconds and milliseconds to 0
-
-    // Format as YYYY-MM-DDTHH:MM for datetime-local input compatibility
-    const year = combined.getFullYear();
-    const month = String(combined.getMonth() + 1).padStart(2, "0");
-    const day = String(combined.getDate()).padStart(2, "0");
-    const hour = String(combined.getHours()).padStart(2, "0");
-    const minute = String(combined.getMinutes()).padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hour}:${minute}`;
-  };
-
-  const handleStartDateChange = (date: Date | undefined) => {
-    setStartDate(date);
-    if (date) {
-      const combined = combineDateAndTime(date, startTime);
-      form.setValue("startDate", combined);
-    }
-  };
-
-  const handleStartTimeChange = (time: string) => {
-    setStartTime(time);
-    if (startDate) {
-      const combined = combineDateAndTime(startDate, time);
-      form.setValue("startDate", combined);
-    }
-  };
-
-  const handleEndDateChange = (date: Date | undefined) => {
-    setEndDate(date);
-    if (date) {
-      const combined = combineDateAndTime(date, endTime);
-      form.setValue("endDate", combined);
-    }
-  };
-
-  const handleEndTimeChange = (time: string) => {
-    setEndTime(time);
-    if (endDate) {
-      const combined = combineDateAndTime(endDate, time);
-      form.setValue("endDate", combined);
-    }
-  };
+  // Watch the isPeriodic value from the form
+  const isPeriodic = form.watch("isPeriodic");
 
   return (
     <div className="space-y-6">
@@ -245,58 +193,87 @@ export default function EventForm({
                 <FormField
                   control={form.control}
                   name="startDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="px-1">Date</FormLabel>
-                      <Popover
-                        open={startDateOpen}
-                        onOpenChange={setStartDateOpen}
-                      >
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
-                            >
-                              {startDate
-                                ? startDate.toLocaleDateString()
-                                : "Select date"}
-                              <ChevronDownIcon className="h-4 w-4" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto overflow-hidden p-0"
-                          align="start"
+                  render={({ field }) => {
+                    const currentDate = field.value
+                      ? new Date(field.value)
+                      : undefined;
+                    return (
+                      <FormItem>
+                        <FormLabel className="px-1">Date</FormLabel>
+                        <Popover
+                          open={startDateOpen}
+                          onOpenChange={setStartDateOpen}
                         >
-                          <Calendar
-                            mode="single"
-                            selected={startDate}
-                            captionLayout="dropdown"
-                            onSelect={(date) => {
-                              handleStartDateChange(date);
-                              setStartDateOpen(false);
-                            }}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
+                              >
+                                {currentDate
+                                  ? formatDisplayDate(currentDate)
+                                  : "Select date"}
+                                <ChevronDownIcon className="h-4 w-4" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-auto overflow-hidden p-0"
+                            align="start"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={currentDate}
+                              captionLayout="dropdown"
+                              onSelect={(date) => {
+                                if (date) {
+                                  const newDateTime = updateDateTimeDate(
+                                    field.value,
+                                    date
+                                  );
+                                  field.onChange(newDateTime);
+                                }
+                                setStartDateOpen(false);
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <FormItem>
-                  <FormLabel className="px-1">Time</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => handleStartTimeChange(e.target.value)}
-                      className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                    />
-                  </FormControl>
-                </FormItem>
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => {
+                    const currentTime = field.value
+                      ? formatDisplayTime(field.value)
+                      : "10:00";
+                    return (
+                      <FormItem>
+                        <FormLabel className="px-1">Time</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="time"
+                            value={currentTime}
+                            onChange={(e) => {
+                              const newDateTime = updateDateTimeTime(
+                                field.value,
+                                e.target.value
+                              );
+                              field.onChange(newDateTime);
+                            }}
+                            className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -309,55 +286,87 @@ export default function EventForm({
                 <FormField
                   control={form.control}
                   name="endDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="px-1">Date</FormLabel>
-                      <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
-                            >
-                              {endDate
-                                ? endDate.toLocaleDateString()
-                                : "Select date"}
-                              <ChevronDownIcon className="h-4 w-4" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto overflow-hidden p-0"
-                          align="start"
+                  render={({ field }) => {
+                    const currentDate = field.value
+                      ? new Date(field.value)
+                      : undefined;
+                    return (
+                      <FormItem>
+                        <FormLabel className="px-1">Date</FormLabel>
+                        <Popover
+                          open={endDateOpen}
+                          onOpenChange={setEndDateOpen}
                         >
-                          <Calendar
-                            mode="single"
-                            selected={endDate}
-                            captionLayout="dropdown"
-                            onSelect={(date) => {
-                              handleEndDateChange(date);
-                              setEndDateOpen(false);
-                            }}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
+                              >
+                                {currentDate
+                                  ? formatDisplayDate(currentDate)
+                                  : "Select date"}
+                                <ChevronDownIcon className="h-4 w-4" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-auto overflow-hidden p-0"
+                            align="start"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={currentDate}
+                              captionLayout="dropdown"
+                              onSelect={(date) => {
+                                if (date) {
+                                  const newDateTime = updateDateTimeDate(
+                                    field.value,
+                                    date
+                                  );
+                                  field.onChange(newDateTime);
+                                }
+                                setEndDateOpen(false);
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <FormItem>
-                  <FormLabel className="px-1">Time</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => handleEndTimeChange(e.target.value)}
-                      className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                    />
-                  </FormControl>
-                </FormItem>
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => {
+                    const currentTime = field.value
+                      ? formatDisplayTime(field.value)
+                      : "12:00";
+                    return (
+                      <FormItem>
+                        <FormLabel className="px-1">Time</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="time"
+                            value={currentTime}
+                            onChange={(e) => {
+                              const newDateTime = updateDateTimeTime(
+                                field.value,
+                                e.target.value
+                              );
+                              field.onChange(newDateTime);
+                            }}
+                            className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
               </div>
             </div>
           </div>

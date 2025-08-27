@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Form schema using Zod
 const setPriceSchema = z.object({
@@ -172,7 +173,6 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
     if (currentStep !== 2 || registeredUsers.length === 0) return [];
 
     const formData = form.getValues();
-    console.log("Step 2 - Form data:", formData);
 
     if (!formData.userPrices) return [];
 
@@ -193,14 +193,6 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
 
       // Note: We can't check for negative balance here because creditBalance is not available
       // in the registration data for security reasons. We'll show warnings after the event is processed.
-
-      console.log(`User ${index}:`, {
-        useDefault: userPrice.useDefault,
-        customPrice: userPrice.customPrice,
-        defaultPrice,
-        finalPrice,
-        isModified,
-      });
 
       return {
         ...userPrice,
@@ -229,11 +221,13 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Set Individual Prices</DialogTitle>
+            <DialogTitle className="text-card-foreground">
+              Set Individual Prices
+            </DialogTitle>
             <DialogDescription>Loading registered users...</DialogDescription>
           </DialogHeader>
-          <div className="flex justify-center items-center p-8">
-            <div className="text-gray-500">Loading...</div>
+          <div className="flex justify-center items-center p-8 text-card-foreground">
+            <div>Loading...</div>
           </div>
         </DialogContent>
       </Dialog>
@@ -304,15 +298,17 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
           <DialogDescription>
             {currentStep === 1 ? (
               <>
-                Set custom prices for each registered user. Default price:
-                <span className="text-blue-800 font-bold">
+                <span className="text-card-foreground text-lg">
+                  Set custom prices for each registered user. Default price:{" "}
+                </span>
+                <span className="text-primary text-lg">
                   $ {defaultPrice.toFixed(2)}
                 </span>
               </>
             ) : (
-              <span className="text-red-600 font-medium">
-                ⚠️ Please review the pricing summary below. Once confirmed,
-                these prices cannot be changed.
+              <span className="text-card-foreground text-lg">
+                Please review the pricing summary below. Once confirmed, these
+                prices cannot be changed.
               </span>
             )}
           </DialogDescription>
@@ -328,87 +324,88 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                 {registeredUsers.map((registration, index) => (
                   <div
                     key={registration.id}
-                    className="flex flex-col lg:flex-row items-start lg:items-center p-4 bg-gray-50 border border-gray-200 rounded-lg"
+                    className="flex flex-col lg:flex-row items-start lg:items-center p-4 bg-card border border-bor rounded-lg"
                   >
-                    <div className="flex items-center gap-3 pb-4 lg:pb-0">
-                      <div className="w-8 h-8 bg-blue-800 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <div className="">
-                        <div className="font-medium text-gray-800 truncate">
-                          {registration.user.name}
+                    <div className="flex justify-between w-full">
+                      <div className="flex items-center gap-3 pb-4 lg:pb-0">
+                        <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                          {index + 1}
                         </div>
-                        <div className="text-sm text-gray-600 truncate">
-                          {registration.user.email}
+                        <div className="">
+                          <div className="font-medium text-card-foreground truncate">
+                            {registration.user.name}
+                          </div>
+                          <div className="text-sm text-primary truncate">
+                            {registration.user.email}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      <FormField
-                        control={form.control}
-                        name={`userPrices.${index}.useDefault`}
-                        render={({ field }) => (
-                          <FormItem className="flex items-center space-x-2 space-y-0 pl-2">
-                            <FormControl>
-                              <input
-                                type="checkbox"
-                                checked={field.value || false}
-                                onChange={(e) => {
-                                  field.onChange(e.target.checked);
-                                  // When "use default" is checked, set custom price to default
-                                  if (e.target.checked) {
-                                    form.setValue(
-                                      `userPrices.${index}.customPrice`,
-                                      defaultPrice
-                                    );
-                                  }
-                                }}
-                                className="w-4 h-4 text-blue-800 bg-gray-100 border-gray-300 rounded focus:ring-blue-800"
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              Use default (${defaultPrice.toFixed(2)})
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name={`userPrices.${index}.customPrice`}
-                        render={({ field }) => (
-                          <FormItem className="w-24">
-                            <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                  $
-                                </span>
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  placeholder="0.00"
-                                  value={field.value || ""}
-                                  disabled={form.watch(
-                                    `userPrices.${index}.useDefault`
-                                  )}
-                                  className="pl-6 text-right"
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    field.onChange(
-                                      value === "" ? "" : parseFloat(value) || 0
-                                    );
+                      <div className="flex items-center gap-4 flex-shrink-0 ">
+                        <FormField
+                          control={form.control}
+                          name={`userPrices.${index}.useDefault`}
+                          render={({ field }) => (
+                            <FormItem className="flex items-center space-x-2 space-y-0 pl-2">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value || false}
+                                  onCheckedChange={(checked) => {
+                                    field.onChange(checked);
+                                    // When "use default" is checked, set custom price to default
+                                    if (checked) {
+                                      form.setValue(
+                                        `userPrices.${index}.customPrice`,
+                                        defaultPrice
+                                      );
+                                    }
                                   }}
                                 />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">
+                                Use default (${defaultPrice.toFixed(2)})
+                              </FormLabel>
+                            </FormItem>
+                          )}
+                        />
 
+                        <FormField
+                          control={form.control}
+                          name={`userPrices.${index}.customPrice`}
+                          render={({ field }) => (
+                            <FormItem className="w-24">
+                              <FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                                    $
+                                  </span>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    value={field.value || ""}
+                                    disabled={form.watch(
+                                      `userPrices.${index}.useDefault`
+                                    )}
+                                    className="pl-6 text-right"
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      field.onChange(
+                                        value === ""
+                                          ? ""
+                                          : parseFloat(value) || 0
+                                      );
+                                    }}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
                     {/* Hidden fields to store userId and registrationId */}
                     <FormField
                       control={form.control}
@@ -442,13 +439,14 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isLoading}
+                  className="hover:cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-blue-800 text-white hover:bg-blue-900 hover:cursor-pointer"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 hover:cursor-pointer"
                 >
                   Next: Review & Confirm
                 </Button>
@@ -459,19 +457,21 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
           // Step 2: Confirmation
           <div className="flex flex-col flex-1 min-h-0">
             <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                <h3 className="font-semibold text-yellow-800 mb-2">
+              <div className="bg-secondary border border-secondary rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   Pricing Summary
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">Total Attendees:</span>
+                    <span className="text-foreground">Total Attendees:</span>
                     <span className="font-medium ml-2">
                       {userPricesWithDetails.length}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Default Price Users:</span>
+                    <span className="text-foreground">
+                      Default Price Users:
+                    </span>
                     <span className="font-medium ml-2">
                       {
                         userPricesWithDetails.filter((u) => !u.isModified)
@@ -480,14 +480,14 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Custom Price Users:</span>
-                    <span className="font-medium ml-2 text-red-600">
+                    <span className="text-foreground">Custom Price Users:</span>
+                    <span className="font-medium ml-2">
                       {userPricesWithDetails.filter((u) => u.isModified).length}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Total to Collect:</span>
-                    <span className="font-medium ml-2 text-green-600">
+                    <span className="text-foreground">Total to Collect:</span>
+                    <span className="font-medium ml-2">
                       $
                       {userPricesWithDetails
                         .reduce((sum, u) => sum + u.finalPrice, 0)
@@ -505,17 +505,17 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                 userPricesWithDetails.map((userPrice, index) => (
                   <div
                     key={userPrice.userId}
-                    className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-card border border-border rounded-lg"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-8 h-8 bg-blue-800 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                      <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-800 truncate">
+                        <div className="font-medium text-card-foreground truncate">
                           {userPrice.userName}
                         </div>
-                        <div className="text-sm text-gray-600 truncate">
+                        <div className="text-sm text-primary truncate">
                           {userPrice.userEmail}
                         </div>
                       </div>
@@ -524,7 +524,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                     <div className="flex items-center gap-4 flex-shrink-0">
                       <div className="text-right">
                         <div
-                          className={`font-bold ${
+                          className={`f ${
                             userPrice.isModified
                               ? "text-red-600"
                               : "text-gray-800"
@@ -545,13 +545,14 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
                 variant="outline"
                 onClick={handleStepBack}
                 disabled={isLoading}
+                className="hover:cursor-pointer"
               >
                 Step Back
               </Button>
               <Button
                 onClick={handleConfirmEndEvent}
                 disabled={isLoading}
-                className="bg-blue-800 hover:bg-blue-900 hover:cursor-pointer"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 hover:cursor-pointer"
               >
                 {isLoading ? "Ending Event..." : "Confirm End Event"}
               </Button>

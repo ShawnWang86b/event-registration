@@ -6,6 +6,7 @@ import {
 } from "@/hooks/use-registrations";
 import React from "react";
 import { Trash2, UserRoundCheck } from "lucide-react";
+import { formatDisplayDate } from "@/utils/dateTime";
 
 interface RegistrationListProps {
   eventId: number;
@@ -164,7 +165,7 @@ const RegistrationList = ({
         <div className="mb-6 p-4 bg-card border border-border rounded-lg">
           <div className="text-card-foreground flex items-center gap-2">
             <UserRoundCheck size={16} />
-            <span >You are registered for this event!</span>
+            <span>You are registered for this event!</span>
           </div>
         </div>
       )}
@@ -252,9 +253,7 @@ const RegistrationList = ({
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-gray-500">
-                    {new Date(
-                      registration.registrationDate
-                    ).toLocaleDateString()}
+                    {formatDisplayDate(registration.registrationDate)}
                   </div>
                   {registration.userId === userId && (
                     <button

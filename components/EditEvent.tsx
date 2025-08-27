@@ -3,7 +3,8 @@
 import { useUpdateEvent, useToggleEventStatus } from "@/hooks/use-events";
 import { EventFormData } from "@/lib/schemas";
 import { Event } from "@/lib/types";
-import EventForm from "./event-form";
+import EventForm from "./EventForm";
+import { formatDateTimeLocal } from "@/utils/dateTime";
 import {
   Dialog,
   DialogContent,
@@ -33,9 +34,8 @@ export default function EditEventDialog({
         data.title === event.title &&
         data.description === event.description &&
         data.price === parseFloat(event.price) &&
-        data.startDate ===
-          new Date(event.startDate).toISOString().slice(0, 16) &&
-        data.endDate === new Date(event.endDate).toISOString().slice(0, 16) &&
+        data.startDate === formatDateTimeLocal(event.startDate) &&
+        data.endDate === formatDateTimeLocal(event.endDate) &&
         (data.location || "") === (event.location || "") &&
         data.isPeriodic === event.isPeriodic &&
         (data.frequency || "") === (event.frequency || "") &&
@@ -72,17 +72,10 @@ export default function EditEventDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Event</DialogTitle>
-          <DialogDescription>
-            Event ID: {event.id} • Status:{" "}
-            {event.isActive ? (
-              <span className="text-green-600 font-medium">Active</span>
-            ) : (
-              <span className="text-red-600 font-medium">Inactive</span>
-            )}
-          </DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
         <EventForm

@@ -22,6 +22,7 @@ export default function RootLayout({
           <QueryProvider>
             <SidebarProvider>
               <AppSidebar />
+              <SidebarTrigger />
               <main>{children}</main>
             </SidebarProvider>
           </QueryProvider>

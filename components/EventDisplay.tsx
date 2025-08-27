@@ -6,7 +6,7 @@ import { useEvents } from "@/hooks/use-events";
 import { useCurrentUser } from "@/hooks";
 import EventCard from "@/components/EventCard";
 import LoadingSpinner from "@/components/loading-spinner";
-import CreateEventDialog from "@/components/create-event-dialog";
+import CreateEventDialog from "@/components/CreateEvent";
 import { useSidebar } from "@/components/ui/sidebar";
 
 const EventDisplay = () => {
@@ -41,7 +41,7 @@ const EventDisplay = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center p-8">
+      <div className="flex justify-center items-center p-8 min-h-[100vh] min-w-[80vw]">
         <div className="text-red-500 text-lg">Error: {error}</div>
       </div>
     );
@@ -49,8 +49,8 @@ const EventDisplay = () => {
 
   if (events.length === 0) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-gray-500 text-lg">No events found</div>
+      <div className="flex justify-center items-center p-8 min-h-[100vh] min-w-[80vw]">
+        <div className="text-primary text-lg">No events found</div>
       </div>
     );
   }
@@ -62,7 +62,7 @@ const EventDisplay = () => {
           <h1 className="text-3xl font-bold text-secondary-foreground">
             Events
           </h1>
-          <p className="text-gray-600 text-lg mt-2">
+          <p className="text-primary text-lg mt-2">
             Discover and register for upcoming basketball events
           </p>
         </div>

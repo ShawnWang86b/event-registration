@@ -56,7 +56,7 @@ export default function Home() {
           />
         </div>
 
-        <h1 className="text-2xl md:text-5xl font-bold text-secondary-foreground mb-6">
+        <h1 className="text-2xl md:text-5xl font-bold text-foreground mb-6">
           Welcome to Melbourne Old Boys Hoops
         </h1>
         <p className="text-sm md:text-lg text-primary mb-8 max-w-3xl mx-auto">

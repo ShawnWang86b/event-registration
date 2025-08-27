@@ -4,16 +4,16 @@ export interface Event {
   title: string;
   description: string;
   price: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string | Date; // API returns string, but may be Date object in some contexts
+  endDate: string | Date; // API returns string, but may be Date object in some contexts
   location?: string;
   isPeriodic: boolean;
   frequency?: string;
   maxAttendees: number;
   createdById: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string | Date; // API returns string, but may be Date object in some contexts
+  updatedAt: string | Date; // API returns string, but may be Date object in some contexts
 }
 
 export interface CreateEventData {

@@ -2,7 +2,7 @@
 
 import { useCreateEvent } from "@/hooks/use-events";
 import { EventFormData } from "@/lib/schemas";
-import EventForm from "./event-form";
+import EventForm from "./EventForm";
 import {
   Dialog,
   DialogContent,
