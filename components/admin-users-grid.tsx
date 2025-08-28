@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "./ui/shadcn-io/spinner";
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -58,7 +59,7 @@ const AdminUsersGrid = () => {
     return (
       <span
         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          isAdmin ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+          isAdmin ? "bg-blue-100 text-primary" : "bg-gray-100 text-gray-800"
         }`}
       >
         {role}
@@ -132,16 +133,15 @@ const AdminUsersGrid = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-foreground text-lg">All Users</CardTitle>
+          <CardDescription className="text-primary text-md">
             Manage and view all registered users
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading users...</p>
+              <Spinner variant="ellipsis" className="text-primary" />
             </div>
           </div>
         </CardContent>
@@ -153,8 +153,8 @@ const AdminUsersGrid = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-foreground text-lg">All Users</CardTitle>
+          <CardDescription className="text-primary text-md">
             Manage and view all registered users
           </CardDescription>
         </CardHeader>
@@ -176,11 +176,13 @@ const AdminUsersGrid = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-foreground text-lg">
           <span>All Users</span>
-          <Badge variant="outline">{pagination?.total || 0} total users</Badge>
+          <Badge variant="outline" className="text-primary">
+            {pagination?.total || 0} total users
+          </Badge>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-primary text-md">
           Manage and view all registered users with their account details
         </CardDescription>
       </CardHeader>
@@ -203,7 +205,7 @@ const AdminUsersGrid = () => {
         </div>
 
         {pagination && (
-          <div className="mt-4 text-sm text-gray-600 text-center">
+          <div className="mt-4 text-sm text-primary text-center">
             Showing {users.length} of {pagination.total} users
           </div>
         )}

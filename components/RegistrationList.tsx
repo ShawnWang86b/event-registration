@@ -27,18 +27,6 @@ const RegistrationList = ({
     refetch,
   } = useEventRegistrations(eventId);
 
-  // Debug: Log summary data changes
-  React.useEffect(() => {
-    if (data?.summary) {
-      console.log("Summary updated:", {
-        registeredCount: data.summary.registeredCount,
-        waitlistCount: data.summary.waitlistCount,
-        availableSpots: data.summary.availableSpots,
-        totalRegistrations: data.summary.totalRegistrations,
-      });
-    }
-  }, [data?.summary]);
-
   // Mutations
   const joinEventMutation = useJoinEvent();
   const cancelRegistrationMutation = useCancelEventRegistration();

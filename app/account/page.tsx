@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CalorieChart from "@/components/calorie-chart";
 import { useSidebar } from "@/components/ui/sidebar";
 import LoadingSpinner from "@/components/loading-spinner";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 
 const AccountPage = () => {
   const currentDate = useMemo(() => new Date(), []);
@@ -131,121 +132,105 @@ const AccountPage = () => {
   }
 
   return (
-    <div
-      className="container mx-auto p-6 w-full lg:w-auto"
-      style={
-        typeof window !== "undefined" && window.innerWidth >= 1024
-          ? state === "collapsed"
-            ? { width: "100vw" }
-            : { width: "calc(100vw - var(--sidebar-width))" }
-          : {}
-      }
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Account Dashboard
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Manage your account and view transaction history
-          </p>
-        </div>
+    <div className="min-h-screen min-w-[80vw] lg:w-auto p-16">
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Account Dashboard</h1>
+        <p className="text-primary text-lg mt-2">
+          Manage your account and view transaction history
+        </p>
+      </div>
 
-        <div className="w-full">
-          <Tabs defaultValue="transactions" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="transactions">
-                Recent Transactions
-              </TabsTrigger>
-              <TabsTrigger value="reports">Calorie Consumption</TabsTrigger>
-            </TabsList>
+      <div className="w-full">
+        <Tabs defaultValue="transactions" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
+            <TabsTrigger value="reports">Calorie Consumption</TabsTrigger>
+          </TabsList>
 
-            {/* Transactions Tab */}
-            <TabsContent value="transactions" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <History className="h-5 w-5" />
-                    Transaction History
-                  </CardTitle>
-                  <CardDescription>
-                    Your recent credit transactions and activity
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {transactionsLoading ? (
-                    <div className="flex justify-center py-8">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    </div>
-                  ) : transactionsData?.transactions.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      No transactions found
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {transactionsData?.transactions.map((transaction) => {
-                        const amountInfo = formatTransactionAmount(
-                          parseFloat(transaction.amount),
-                          transaction.type
-                        );
-                        return (
-                          <div
-                            key={transaction.id}
-                            className="flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm lg:text-base pb-2 lg:pb-0 font-medium">
-                                  {transaction.description}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-4 text-sm text-gray-600">
-                                <span>
-                                  {new Date(
-                                    transaction.createdAt
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                              </div>
+          {/* Transactions Tab */}
+          <TabsContent value="transactions" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground text-lg">
+                  Transaction History
+                </CardTitle>
+                <CardDescription className="text-primary text-md">
+                  Your recent credit transactions and activity
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {transactionsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Spinner variant="ellipsis" className="text-primary" />
+                  </div>
+                ) : transactionsData?.transactions.length === 0 ? (
+                  <div className="text-center py-8 text-primary text-lg">
+                    No transactions found
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {transactionsData?.transactions.map((transaction) => {
+                      const amountInfo = formatTransactionAmount(
+                        parseFloat(transaction.amount),
+                        transaction.type
+                      );
+                      return (
+                        <div
+                          key={transaction.id}
+                          className="flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm lg:text-base pb-2 lg:pb-0 font-medium">
+                                {transaction.description}
+                              </span>
                             </div>
-                            <div className="text-left lg:text-right py-2 lg:py-0">
-                              <div className="text-sm text-gray-600">
-                                Amount:{" "}
-                                <span
-                                  className={`font-semibold ${amountInfo.color}`}
-                                >
-                                  {amountInfo.sign}
-                                  {amountInfo.amount}
-                                </span>
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                Balance:{" "}
-                                {formatCurrency(
-                                  parseFloat(transaction.balanceAfter)
-                                )}
-                              </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <span>
+                                {new Date(
+                                  transaction.createdAt
+                                ).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+                          <div className="text-left lg:text-right py-2 lg:py-0">
+                            <div className="text-sm text-gray-600">
+                              Amount:{" "}
+                              <span
+                                className={`font-semibold ${amountInfo.color}`}
+                              >
+                                {amountInfo.sign}
+                                {amountInfo.amount}
+                              </span>
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              Balance:{" "}
+                              {formatCurrency(
+                                parseFloat(transaction.balanceAfter)
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            {/* Monthly Reports Tab */}
-            <TabsContent value="reports" className="space-y-6">
-              <CalorieChart />
-            </TabsContent>
-          </Tabs>
-        </div>
+          {/* Monthly Reports Tab */}
+          <TabsContent value="reports" className="space-y-6">
+            <CalorieChart />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

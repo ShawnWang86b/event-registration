@@ -17,6 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Flame, Trophy, Calendar } from "lucide-react";
+import { Spinner } from "./ui/shadcn-io/spinner";
 
 const chartConfig = {
   views: {
@@ -63,19 +64,17 @@ const CalorieChart = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-orange-500" />
+          <CardTitle className="flex items-center gap-2 text-foreground text-lg">
             Calorie Consumption Progress
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-primary text-md">
             Track your fitness progress through event attendance
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading calorie data...</p>
+              <Spinner variant="ellipsis" className="text-primary" />
             </div>
           </div>
         </CardContent>
@@ -87,20 +86,16 @@ const CalorieChart = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-orange-500" />
+          <CardTitle className="flex items-center gap-2 text-foreground text-lg">
             Calorie Consumption Progress
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-primary text-md">
             Track your fitness progress through event attendance
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-red-600">Error loading calorie data</p>
-            <p className="text-sm text-gray-600 mt-1">
-              Please try refreshing the page
-            </p>
+            <p className="text-primary text-lg">Error loading calorie data</p>
           </div>
         </CardContent>
       </Card>
@@ -111,19 +106,17 @@ const CalorieChart = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-orange-500" />
+          <CardTitle className="flex items-center gap-2 text-foreground text-lg">
             Calorie Consumption Progress
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-primary text-md">
             Track your fitness progress through event attendance
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-gray-600">No event attendance data available</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Start attending events to see your calorie consumption!
+            <p className="text-primary text-lg">
+              No event attendance data available
             </p>
           </div>
         </CardContent>
@@ -131,19 +124,13 @@ const CalorieChart = () => {
     );
   }
 
-  const joinDate = new Date(calorieData.joinDate).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
   return (
     <div className="space-y-6">
       {/* Calorie Message */}
       <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
         <p className="text-lg font-semibold text-orange-800">
-          🔥 You&apos;ve burned {calorieData.totalCalories.toLocaleString()}{" "}
-          calories since joining this club! 🔥
+          You&apos;ve burned {calorieData.totalCalories.toLocaleString()}{" "}
+          calories since joining this club!
         </p>
         <p className="text-sm text-orange-600 mt-1">
           Keep up the great work! Each event you attend burns 500 calories.

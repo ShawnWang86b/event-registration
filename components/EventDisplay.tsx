@@ -24,8 +24,6 @@ const EventDisplay = () => {
 
   const error = queryError ? "Failed to fetch events" : null;
 
-  const { state } = useSidebar();
-
   // Handle client-side mounting
   useEffect(() => {
     setIsClient(true);

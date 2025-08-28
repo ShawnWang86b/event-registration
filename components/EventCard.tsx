@@ -1,11 +1,5 @@
 import { useState } from "react";
 import Image from "next/image";
-import { useEventRegistrations } from "@/hooks/use-registrations";
-import { useCurrentUser } from "@/hooks";
-import { Event } from "@/lib/types";
-import RegistrationList from "@/components/RegistrationList";
-import EditEventDialog from "@/components/EditEvent";
-import SetPriceDialog from "@/components/SetPrice";
 import {
   Dialog,
   DialogContent,
@@ -13,13 +7,20 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { MoveRight } from "lucide-react";
+import { MoveRight, X } from "lucide-react";
+import { useEventRegistrations } from "@/hooks/use-registrations";
+import { useCurrentUser } from "@/hooks";
+import { Event } from "@/lib/types";
+import RegistrationList from "@/components/RegistrationList";
+import EditEventDialog from "@/components/EditEvent";
+import SetPriceDialog from "@/components/SetPrice";
 import {
   formatDisplayDate,
   formatDisplayTimeRange,
   formatDisplayDateLong,
   formatDisplayTime12Hour,
 } from "@/utils/dateTime";
+import { Button } from "./ui/button";
 
 type EventCardProps = {
   event: Event;
@@ -34,9 +35,7 @@ const EventCard = ({
   isExpanded: externalExpanded = false,
   onClose,
 }: EventCardProps) => {
-  // Internal expanded state for the registration section
   const [isRegistrationExpanded, setIsRegistrationExpanded] = useState(false);
-  const [isEndDialogOpen, setIsEndDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSetPriceDialogOpen, setIsSetPriceDialogOpen] = useState(false);
 
@@ -44,7 +43,6 @@ const EventCard = ({
   const { data: currentUserData } = useCurrentUser();
   const isAdmin = currentUserData?.user?.role === "admin";
 
-  // Use TanStack Query for fetching registration status
   const {
     data: registrationData,
     isLoading: loading,
@@ -65,7 +63,7 @@ const EventCard = ({
     registrationStatus &&
     registrationStatus.currentRegistrations >= registrationStatus.maxAttendees;
 
-  // Function to get the appropriate image based on location
+  // Hard Code here for now, will modify it in multi-tenant version
   const getLocationImage = (location: string | null | undefined) => {
     if (!location) return "/stadium/default.jpg";
 
@@ -87,12 +85,14 @@ const EventCard = ({
             <h3 className="text-lg font-semibold text-primary">
               Event Details
             </h3>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer"
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors hover:scale-110"
             >
-              ×
-            </button>
+              <X className="w-4 h-4" />
+            </Button>
           </div>
         )}
 
@@ -107,7 +107,7 @@ const EventCard = ({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsEditDialogOpen(true)}
-                    className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-full transition-colors font-medium"
+                    className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-md transition-colors font-medium"
                   >
                     Edit
                   </button>
@@ -115,7 +115,7 @@ const EventCard = ({
                   {event.isActive && (
                     <button
                       onClick={() => setIsSetPriceDialogOpen(true)}
-                      className="cursor-pointer bg-secondary hover:bg-secondary/90 text-white text-xs px-3 py-1 rounded-full transition-colors font-medium"
+                      className="cursor-pointer bg-secondary hover:bg-secondary/90 text-white text-xs px-3 py-1 rounded-md transition-colors font-medium"
                     >
                       Set Price
                     </button>
@@ -126,7 +126,7 @@ const EventCard = ({
           )}
 
           {/* Event Image with Title and Description Overlay - Large screens only */}
-          <div className="relative mb-6 h-48 rounded-lg overflow-hidden hidden lg:block">
+          <div className="relative mb-6 h-48 rounded-lg overflow-hidden">
             <Image
               src={getLocationImage(event.location)}
               alt={event.location || "Event location"}
@@ -143,25 +143,6 @@ const EventCard = ({
             </div>
           </div>
 
-          {/* Event Title and Description - Mobile only */}
-          <div className="mb-6 lg:hidden">
-            <h2 className="text-xl font-semibold mb-2 text-gray-900">
-              {event.title}
-            </h2>
-            <p className="text-gray-600 text-sm line-clamp-3">
-              {event.description}
-            </p>
-          </div>
-
-          {/* Event ended notice */}
-          {!event.isActive && (
-            <div className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
-              <div className="text-gray-600 text-sm font-medium text-center">
-                🔒 This event has ended
-              </div>
-            </div>
-          )}
-
           <div className="space-y-2 text-card-foreground">
             <div className="flex justify-between">
               <span>Price:</span>
@@ -170,7 +151,7 @@ const EventCard = ({
 
             <div className="flex justify-between">
               <span>Date:</span>
-              <span>{formatDisplayDate(event.startDate)}</span>
+              <span>{formatDisplayDateLong(event.startDate)}</span>
             </div>
 
             <div className="flex justify-between">
@@ -213,17 +194,6 @@ const EventCard = ({
                 {event.frequency ? event.frequency : "one time"}
               </span>
             </div>
-
-            <div className="flex justify-between">
-              <span>Status:</span>
-              <span
-                className={`font-semibold ${
-                  event.isActive ? "text-primary" : "text-secondary"
-                }`}
-              >
-                {event.isActive ? "Active" : "Ended"}
-              </span>
-            </div>
           </div>
 
           {/* Register button */}
@@ -244,11 +214,11 @@ const EventCard = ({
             </button>
           </div>
 
-          {/* Expanded message for external expanded state */}
+          {/* will design a better way */}
           {externalExpanded && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="text-center text-blue-600 font-medium">
-                📋 Registration details shown below
+            <div className="mt-4 pt-4">
+              <div className="text-center text-primary">
+                Registration details shown below, coming soon...
               </div>
             </div>
           )}
@@ -280,10 +250,10 @@ const EventCard = ({
               </div>
               <div className="bg-card p-3 rounded border">
                 <h3 className="font-semibold text-card-foreground text-sm mb-1">
-                  Start Time
+                  Time
                 </h3>
                 <p className="text-primary text-sm font-medium">
-                  {formatDisplayTime12Hour(event.startDate)}
+                  {formatDisplayTimeRange(event.startDate, event.endDate)}
                 </p>
               </div>
             </div>
