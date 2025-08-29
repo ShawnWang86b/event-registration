@@ -1,95 +1,83 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { CalendarPlus } from "lucide-react";
-import { useEvents } from "@/hooks/use-events";
-import { useCurrentUser } from "@/hooks";
-import EventCard from "@/components/EventCard";
-import LoadingSpinner from "@/components/loading-spinner";
 import CreateEventDialog from "@/components/CreateEvent";
-import { useSidebar } from "@/components/ui/sidebar";
+import { LoadingState, ErrorState, EmptyState } from "@/components/ui/states";
+import { EventDisplayHeader, EventGrid } from "@/components/event-display";
+import { useEventDisplay } from "@/hooks/use-event-display";
+import { EVENT_DISPLAY_CONSTANTS } from "@/constants/eventDisplay";
+import { withErrorBoundary } from "@/components/ErrorBoundary";
 
 const EventDisplay = () => {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  const { data: currentUserData } = useCurrentUser();
-  const isAdmin = currentUserData?.user?.role === "admin";
-
   const {
-    data: events = [],
-    isLoading: loading,
-    error: queryError,
-  } = useEvents();
+    displayState,
+    isCreateDialogOpen,
+    events,
+    isAdmin,
+    errorType,
+    errorMessage,
+    handleCreateClick,
+    handleCreateClose,
+    handleRetry,
+    handleEventRegister,
+    emptyStateAction,
+  } = useEventDisplay();
 
-  const error = queryError ? "Failed to fetch events" : null;
+  // Render different states
+  switch (displayState) {
+    case "loading":
+      return <LoadingState message="Loading events..." />;
 
-  // Handle client-side mounting
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+    case "error":
+      return (
+        <ErrorState
+          message={errorMessage}
+          errorType={errorType}
+          onRetry={handleRetry}
+          showDetails={process.env.NODE_ENV === "development"}
+          details={errorMessage}
+        />
+      );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[100vh] min-w-[80vw]">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+    case "empty":
+      return (
+        <EmptyState
+          title={EVENT_DISPLAY_CONSTANTS.TEXT.NO_EVENTS}
+          message="There are no events available at the moment. Check back later or create a new event if you're an admin."
+          action={emptyStateAction}
+        />
+      );
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center p-8 min-h-[100vh] min-w-[80vw]">
-        <div className="text-red-500 text-lg">Error: {error}</div>
-      </div>
-    );
-  }
+    case "success":
+    default:
+      return (
+        <div className="min-h-screen min-w-[80vw] lg:w-auto p-16">
+          <EventDisplayHeader
+            isAdmin={isAdmin}
+            onCreateClick={handleCreateClick}
+          />
 
-  if (events.length === 0) {
-    return (
-      <div className="flex justify-center items-center p-8 min-h-[100vh] min-w-[80vw]">
-        <div className="text-primary text-lg">No events found</div>
-      </div>
-    );
-  }
+          <EventGrid events={events} onEventRegister={handleEventRegister} />
 
-  return (
-    <div className="min-h-screen min-w-[80vw] lg:w-auto p-16">
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-secondary-foreground">
-            Events
-          </h1>
-          <p className="text-primary text-lg mt-2">
-            Discover and register for upcoming basketball events
-          </p>
+          {/* Create Event Dialog */}
+          <CreateEventDialog
+            isOpen={isCreateDialogOpen}
+            onClose={handleCreateClose}
+          />
         </div>
-
-        {/* Admin-only Create Event Button */}
-        {isAdmin && (
-          <button
-            onClick={() => setIsCreateDialogOpen(true)}
-            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-sm p-4 rounded-full transition-colors hover:cursor-pointer"
-          >
-            <CalendarPlus size={16} />
-            {/* Create Event */}
-          </button>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
-
-      {/* Create Event Dialog */}
-      <CreateEventDialog
-        isOpen={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
-      />
-    </div>
-  );
+      );
+  }
 };
 
-export default EventDisplay;
+// Export wrapped component with error boundary
+const EventDisplayWithErrorBoundary = withErrorBoundary(
+  EventDisplay,
+  <ErrorState
+    message="Failed to load events page"
+    errorType="unknown"
+    fullHeight={true}
+  />
+);
+
+EventDisplayWithErrorBoundary.displayName = "EventDisplay";
+
+export default EventDisplayWithErrorBoundary;

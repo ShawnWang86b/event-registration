@@ -1,16 +1,4 @@
-import { LucideIcon } from "lucide-react";
-
-interface Feature {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-}
-
-interface FeaturesSectionProps {
-  title?: string;
-  features: Feature[];
-  className?: string;
-}
+import { FeaturesSectionProps } from "@/types/homePage";
 
 export default function FeaturesSection({
   title = "Why Join Us?",

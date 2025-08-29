@@ -2,44 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Users, Trophy } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
 import ClubGallery from "@/components/ClubGallery";
 import FeaturesSection from "@/components/FeaturesSection";
+import { features, galleryImages } from "@/constants/homePage";
 
 export default function Home() {
-  const { state } = useSidebar();
-
-  const galleryImages = [
-    { src: "/team/image-1.jpg", alt: "Basketball game action" },
-    { src: "/team/image-2.jpg", alt: "Team training session" },
-    { src: "/team/image-3.jpg", alt: "Basketball tournament" },
-    { src: "/team/image-4.jpg", alt: "Team celebration" },
-    { src: "/team/image-5.jpg", alt: "OldBoy Basketball Club team" },
-    { src: "/team/image-6.jpg", alt: "Basketball practice" },
-  ];
-
-  const features = [
-    {
-      icon: Calendar,
-      title: "Regular Events",
-      description:
-        "Weekly games, tournaments, and training sessions for all skill levels.",
-    },
-    {
-      icon: Users,
-      title: "Community",
-      description:
-        "Connect with passionate players and build lasting friendships on and off the court.",
-    },
-    {
-      icon: Trophy,
-      title: "Competition",
-      description:
-        "Participate in organized leagues and tournaments to test your skills.",
-    },
-  ];
-
   return (
     <div className="min-h-screen px-16">
       {/* Hero Section */}
@@ -73,7 +40,7 @@ export default function Home() {
           </Link>
           <Link
             href="/account"
-            className="w-[200px] border border-primary text-primary hover:bg-blue-50 font-medium py-3 px-6 rounded-lg transition-colors"
+            className="w-[200px] border border-primary text-primary hover:bg-accent hover:text-primary-foreground py-3 px-6 rounded-lg transition-colors"
           >
             My Account
           </Link>

@@ -1,0 +1,25 @@
+import { Event } from "@/lib/types";
+import EventCard from "@/components/EventCard";
+
+type EventGridProps = {
+  events: Event[];
+  onEventRegister?: (eventId: number) => void;
+};
+
+/**
+ * Grid component for displaying events
+ * Handles responsive layout and event card rendering
+ */
+export const EventGrid = ({ events, onEventRegister }: EventGridProps) => {
+  if (events.length === 0) {
+    return null; // Let parent handle empty state
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      {events.map((event) => (
+        <EventCard key={event.id} event={event} onRegister={onEventRegister} />
+      ))}
+    </div>
+  );
+};

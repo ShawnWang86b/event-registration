@@ -1,17 +1,5 @@
 import Image from "next/image";
-
-interface GalleryImage {
-  src: string;
-  alt: string;
-  width?: number;
-  height?: number;
-}
-
-interface ClubGalleryProps {
-  title?: string;
-  images: GalleryImage[];
-  className?: string;
-}
+import { ClubGalleryProps } from "@/types/homePage";
 
 export default function ClubGallery({
   title = "Club Gallery",
@@ -25,10 +13,7 @@ export default function ClubGallery({
       </h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {images.map((image, index) => (
-          <div
-            key={index}
-            className="aspect-video bg-gray-100 rounded-lg overflow-hidden"
-          >
+          <div key={index} className="aspect-video rounded-lg overflow-hidden">
             <Image
               src={image.src}
               alt={image.alt}
