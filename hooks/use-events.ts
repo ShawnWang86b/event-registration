@@ -5,7 +5,7 @@ import {
   UpdateEventData,
   EventsQueryParams,
   EndEventWithPricesData,
-} from "@/lib/types";
+} from "@/types";
 import { registrationKeys } from "./use-registrations";
 
 // Query keys

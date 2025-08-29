@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useCurrentUser } from "@/hooks";
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function AdminLayout({
   children,

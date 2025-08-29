@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CalorieChart from "@/components/calorie-chart";
+import CalorieChart from "@/components/CalorieChart";
 import { LoadingState, ErrorState } from "@/components/states";
 import { AccountSummary, TransactionList } from "@/components/account";
 import { useAccount } from "@/hooks";

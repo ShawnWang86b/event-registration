@@ -3,7 +3,7 @@ import {
   formatDisplayDateLong,
 } from "@/utils/dateTime";
 import { EVENT_CARD_CONSTANTS } from "@/constants/eventCard";
-import { Event, EventRegistrationsResponse } from "@/lib/types";
+import { Event, EventRegistrationsResponse } from "@/types";
 import type { EventStatus } from "@/constants/eventCard";
 
 interface EventCardDetailsProps {

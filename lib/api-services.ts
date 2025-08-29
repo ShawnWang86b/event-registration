@@ -24,7 +24,7 @@ import {
   CreditTransactionsResponse,
   CreateTransactionData,
   CreditTransaction,
-} from "./types";
+} from "@/types";
 
 // Events API
 export const eventsApi = {

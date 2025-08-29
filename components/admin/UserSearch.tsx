@@ -1,5 +1,5 @@
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
-import { UserSearchResult } from "@/lib/types";
+import { UserSearchResult } from "@/types";
 
 type UserSearchProps = {
   searchQuery: string;

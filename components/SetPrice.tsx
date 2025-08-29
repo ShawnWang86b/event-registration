@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingState, ErrorState, EmptyState } from "@/components/states";
 import { PriceStep, ConfirmStep } from "@/components/set-price";
 import { useSetPrice } from "@/hooks";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 
 type SetPriceDialogProps = {
   event: Event;
@@ -35,7 +35,6 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
     dataLoading,
     hasError,
     hasNoUsers,
-    isReady,
   } = useSetPrice(event);
 
   const handleCancel = () => {

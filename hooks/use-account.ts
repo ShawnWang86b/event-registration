@@ -52,18 +52,18 @@ export const useAccount = () => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const recentTransactions = transactions.filter(
-      (t) => new Date(t.createdAt) >= thirtyDaysAgo
+      (t: any) => new Date(t.createdAt) >= thirtyDaysAgo
     );
 
     // Calculate totals
     const totalDeposits = transactions
-      .filter((t) => t.type === "deposit")
-      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      .filter((t: any) => t.type === "deposit")
+      .reduce((sum: number, t: any) => sum + parseFloat(t.amount), 0);
 
     const totalSpending = Math.abs(
       transactions
-        .filter((t) => t.type === "spend")
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0)
+        .filter((t: any) => t.type === "spend")
+        .reduce((sum: number, t: any) => sum + parseFloat(t.amount), 0)
     );
 
     return {
@@ -84,17 +84,12 @@ export const useAccount = () => {
   const hasTransactions = (transactionsData?.transactions?.length ?? 0) > 0;
 
   return {
-    // Data
     currentUser,
     transactions: transactionsData?.transactions || [],
     accountSummary,
-
-    // State
     isLoading,
     hasError,
     hasTransactions,
-
-    // Utilities
     formatCurrency,
     formatTransactionAmount,
   };

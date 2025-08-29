@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventFormSchema, EventFormData } from "@/lib/schemas";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 import { formatDateTimeLocal, parseDateTimeLocal } from "@/utils/dateTime";
 
 interface UseEventFormProps {

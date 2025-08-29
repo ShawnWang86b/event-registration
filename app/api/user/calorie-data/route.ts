@@ -2,10 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { creditTransactionsTable } from "@/db/schema";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
-// GET /api/user/calorie-data
-// Get user's successful event attendance data for calorie calculation
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();

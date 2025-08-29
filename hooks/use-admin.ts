@@ -6,7 +6,7 @@ import {
   BalanceAdjustmentData,
   MonthlyReportResponse,
   CreateMonthlyBalanceData,
-} from "@/lib/types";
+} from "@/types";
 
 // Query keys
 export const adminKeys = {

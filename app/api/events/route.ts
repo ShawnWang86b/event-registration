@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { eventsTable, usersTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eventsTable, usersTable, registrationsTable } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 
 // GET all events
 export async function GET(req: Request) {
@@ -184,6 +184,70 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * Recalculates registration statuses when maxAttendees changes
+ * Moves users to waitlist if the new capacity is exceeded
+ */
+async function recalculateRegistrationStatuses(
+  eventId: number,
+  newMaxAttendees: number
+) {
+  // Get all current registrations ordered by registration date (first-come, first-served)
+  const allRegistrations = await db
+    .select()
+    .from(registrationsTable)
+    .where(
+      and(
+        eq(registrationsTable.eventId, eventId),
+        eq(registrationsTable.status, "registered")
+      )
+    )
+    .orderBy(registrationsTable.registrationDate);
+
+  // If we have more registered users than the new capacity
+  if (allRegistrations.length > newMaxAttendees) {
+    // Users beyond the new capacity should be moved to waitlist
+    const usersToWaitlist = allRegistrations.slice(newMaxAttendees);
+
+    // Update their status to 'waitlist'
+    for (const registration of usersToWaitlist) {
+      await db
+        .update(registrationsTable)
+        .set({
+          status: "waitlist",
+          updatedAt: new Date(),
+        })
+        .where(eq(registrationsTable.id, registration.id));
+    }
+  } else {
+    // If capacity increased, potentially move waitlisted users to registered
+    const waitlistUsers = await db
+      .select()
+      .from(registrationsTable)
+      .where(
+        and(
+          eq(registrationsTable.eventId, eventId),
+          eq(registrationsTable.status, "waitlist")
+        )
+      )
+      .orderBy(registrationsTable.registrationDate);
+
+    const availableSpots = newMaxAttendees - allRegistrations.length;
+    const usersToRegister = waitlistUsers.slice(0, availableSpots);
+
+    // Move users from waitlist to registered
+    for (const registration of usersToRegister) {
+      await db
+        .update(registrationsTable)
+        .set({
+          status: "registered",
+          updatedAt: new Date(),
+        })
+        .where(eq(registrationsTable.id, registration.id));
+    }
+  }
+}
+
 // PUT update event (admin only)
 export async function PUT(req: Request) {
   try {
@@ -237,6 +301,11 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
+    // Check if maxAttendees is being changed
+    const oldMaxAttendees = existingEvent.maxAttendees;
+    const newMaxAttendees = maxAttendees ?? oldMaxAttendees;
+    const maxAttendeesChanged = newMaxAttendees !== oldMaxAttendees;
+
     // Update event
     const updatedEvent = await db
       .update(eventsTable)
@@ -249,11 +318,16 @@ export async function PUT(req: Request) {
         location: location ?? existingEvent.location,
         isPeriodic: isPeriodic ?? existingEvent.isPeriodic,
         frequency: frequency ?? existingEvent.frequency,
-        maxAttendees: maxAttendees ?? existingEvent.maxAttendees,
+        maxAttendees: newMaxAttendees,
         isActive: isActive ?? existingEvent.isActive,
       })
       .where(eq(eventsTable.id, id))
       .returning();
+
+    // If maxAttendees changed, recalculate registration statuses
+    if (maxAttendeesChanged) {
+      await recalculateRegistrationStatuses(id, newMaxAttendees);
+    }
 
     return NextResponse.json(updatedEvent[0]);
   } catch (error) {

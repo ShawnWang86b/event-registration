@@ -1,5 +1,5 @@
 import { EVENT_CARD_CONSTANTS } from "@/constants/eventCard";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 
 type EventCardAdminActionsProps = {
   event: Event;

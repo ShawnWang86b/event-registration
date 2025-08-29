@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { EventFormData } from "@/lib/schemas";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 import { useEventForm } from "@/hooks/use-event-form";
 import { EVENT_FORM_CONSTANTS } from "@/constants/eventForm";
 import { DateTimePicker } from "@/components/form/DateTimePicker";

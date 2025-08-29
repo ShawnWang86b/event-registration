@@ -5,7 +5,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { useEventRegistrations } from "@/hooks/use-registrations";
 import { useEndEventWithPrices } from "@/hooks/use-events";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 
 // Form schema
 const setPriceSchema = z.object({
@@ -41,7 +41,7 @@ export const useSetPrice = (event: Event) => {
   const registeredUsers = useMemo(() => {
     return (
       registrationData?.registrations.filter(
-        (reg) => reg.status === "registered"
+        (reg: any) => reg.status === "registered"
       ) || []
     );
   }, [registrationData?.registrations]);
@@ -59,7 +59,7 @@ export const useSetPrice = (event: Event) => {
   // Reset form when registration data changes
   useEffect(() => {
     if (registeredUsers.length > 0) {
-      const userPrices = registeredUsers.map((registration) => ({
+      const userPrices = registeredUsers.map((registration: any) => ({
         userId: registration.userId,
         registrationId: registration.id,
         customPrice: defaultPrice,

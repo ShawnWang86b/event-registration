@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoadingState, ErrorState, EmptyState } from "@/components/states";
-import { CreditTransaction } from "@/lib/types";
+import { CreditTransaction } from "@/types";
 
 type TransactionListProps = {
   transactions: CreditTransaction[];
@@ -87,15 +87,15 @@ export const TransactionList = ({
               return (
                 <div
                   key={transaction.id}
-                  className="flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-col bg-card lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm lg:text-base pb-2 lg:pb-0 font-medium">
+                      <span className="text-md lg:text-md pb-2 lg:pb-0">
                         {transaction.description}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-4 text-sm text-primary">
                       <span>
                         {formatDateTime(transaction.createdAt.toString())}
                       </span>
@@ -103,14 +103,16 @@ export const TransactionList = ({
                   </div>
 
                   <div className="text-left lg:text-right py-2 lg:py-0">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-md text-foreground pr-2">
                       Amount:{" "}
-                      <span className={`font-semibold ${amountInfo.color}`}>
+                      <span
+                        className={`font-semibold tracking-wide ${amountInfo.color}`}
+                      >
                         {amountInfo.sign}
                         {amountInfo.amount}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-md text-foreground pr-2 tracking-wide">
                       Balance:{" "}
                       {formatCurrency(parseFloat(transaction.balanceAfter))}
                     </div>

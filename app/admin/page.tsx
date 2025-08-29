@@ -1,6 +1,6 @@
 "use client";
 
-import AdminUsersGrid from "@/components/admin-users-grid";
+import AdminUsersGrid from "@/components/AdminUsersGrid";
 import {
   Card,
   CardContent,

@@ -1,4 +1,4 @@
-import LoadingSpinner from "@/components/loading-spinner";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { EVENT_DISPLAY_CONSTANTS } from "@/constants/eventDisplay";
 
 type LoadingStateProps = {

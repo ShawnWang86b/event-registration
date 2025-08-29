@@ -5,7 +5,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 import RegistrationList from "@/components/RegistrationList";
 import EditEventDialog from "@/components/EditEvent";
 import SetPriceDialog from "@/components/SetPrice";

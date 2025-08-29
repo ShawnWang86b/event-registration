@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useSearchUsers, useAdjustUserBalance } from "@/hooks";
-import { UserSearchResult } from "@/lib/types";
+import { UserSearchResult } from "@/types";
 
 // Form schema
 const balanceAdjustmentSchema = z.object({
@@ -113,7 +113,7 @@ export const useAdminBalance = () => {
   // Derived state
   const shouldShowDropdown = isComboboxOpen && searchQuery.length >= 2;
   const availableUsers = users.filter(
-    (user) => !selectedUsers.find((u) => u.id === user.id)
+    (user: any) => !selectedUsers.find((u) => u.id === user.id)
   );
 
   return {

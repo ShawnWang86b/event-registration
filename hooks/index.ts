@@ -39,3 +39,7 @@ export { useIsMobile } from "./use-mobile";
 export { useAccount } from "./use-account";
 export { useAdminBalance } from "./use-admin-balance";
 export { useSetPrice } from "./use-set-price";
+export { useRegistrationList } from "./use-registration-list";
+export { useEditEvent } from "./use-edit-event";
+export { useCalorieChart } from "./use-calorie-chart";
+export { useAdminUsersGrid } from "./use-admin-users-grid";

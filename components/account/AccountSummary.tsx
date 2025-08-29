@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Activity, Calendar, TrendingUp } from "lucide-react";
-import { ACCOUNT_CONSTANTS } from "@/constants/account";
 
 type AccountSummaryProps = {
   summary: {
@@ -14,10 +13,6 @@ type AccountSummaryProps = {
   formatCurrency: (amount: number) => string;
 };
 
-/**
- * Account summary section showing key account metrics
- * Displays current balance and account statistics
- */
 export const AccountSummary = ({
   summary,
   formatCurrency,
@@ -27,22 +22,22 @@ export const AccountSummary = ({
       title: "Current Balance",
       value: formatCurrency(summary.currentBalance),
       icon: DollarSign,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
+      color: "text-foreground",
+      bgColor: "bg-card",
     },
     {
       title: "Total Transactions",
       value: summary.totalTransactions.toString(),
       icon: Activity,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
+      color: "text-foreground",
+      bgColor: "bg-card",
     },
     {
-      title: "Recent Activity",
+      title: "Recent Transactions",
       value: `${summary.recentActivity} this month`,
       icon: TrendingUp,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
+      color: "text-foreground",
+      bgColor: "bg-card",
     },
     {
       title: "Last Transaction",
@@ -50,8 +45,8 @@ export const AccountSummary = ({
         ? summary.lastTransaction.toLocaleDateString()
         : "No transactions",
       icon: Calendar,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
+      color: "text-foreground",
+      bgColor: "bg-card",
     },
   ];
 
@@ -59,16 +54,15 @@ export const AccountSummary = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {summaryCards.map((card) => (
         <Card key={card.title}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-medium text-primary">
               {card.title}
             </CardTitle>
-            <div className={`p-2 rounded-full ${card.bgColor}`}>
-              <card.icon className={`w-4 h-4 ${card.color}`} />
-            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{card.value}</div>
+            <div className="text-xl font-semibold text-foreground tracking-wide">
+              {card.value}
+            </div>
           </CardContent>
         </Card>
       ))}

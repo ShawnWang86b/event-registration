@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useEventRegistrations } from "@/hooks/use-registrations";
 import { useCurrentUser } from "@/hooks";
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 import { LOCATION_IMAGE_MAP } from "@/constants/eventCard";
 import type { EventStatus, ButtonState } from "@/constants/eventCard";
 

@@ -1,4 +1,4 @@
-import { Event } from "@/lib/types";
+import { Event } from "@/types";
 import EventCard from "@/components/EventCard";
 
 type EventGridProps = {

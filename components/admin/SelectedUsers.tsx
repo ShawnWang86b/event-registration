@@ -1,4 +1,4 @@
-import { UserSearchResult } from "@/lib/types";
+import { UserSearchResult } from "@/types";
 
 type SelectedUsersProps = {
   selectedUsers: UserSearchResult[];
