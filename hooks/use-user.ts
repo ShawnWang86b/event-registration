@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-services";
-import { MonthlyReportResponse } from "@/lib/types";
 
 // Query keys for user data
 export const userKeys = {

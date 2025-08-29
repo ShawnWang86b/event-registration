@@ -1,7 +1,7 @@
 "use client";
 
 import CreateEventDialog from "@/components/CreateEvent";
-import { LoadingState, ErrorState, EmptyState } from "@/components/ui/states";
+import { LoadingState, ErrorState, EmptyState } from "@/components/states";
 import { EventDisplayHeader, EventGrid } from "@/components/event-display";
 import { useEventDisplay } from "@/hooks/use-event-display";
 import { EVENT_DISPLAY_CONSTANTS } from "@/constants/eventDisplay";

@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-services";
 import {
-  Event,
   CreateEventData,
   UpdateEventData,
   EventsQueryParams,
   EndEventWithPricesData,
 } from "@/lib/types";
+import { registrationKeys } from "./use-registrations";
 
 // Query keys
 export const eventKeys = {
@@ -22,7 +22,7 @@ export const useEvents = (params?: EventsQueryParams) => {
   return useQuery({
     queryKey: eventKeys.list(params),
     queryFn: () => api.events.getEvents(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -32,7 +32,7 @@ export const useEvent = (id: number) => {
     queryKey: eventKeys.detail(id),
     queryFn: () => api.events.getEvent(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -45,7 +45,6 @@ export const useCreateEvent = () => {
     onSuccess: (newEvent) => {
       // Invalidate and refetch events list
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
-
       // Add the new event to the cache
       queryClient.setQueryData(eventKeys.detail(newEvent.id), newEvent);
     },
@@ -64,9 +63,13 @@ export const useUpdateEvent = () => {
     onSuccess: (updatedEvent) => {
       // Invalidate and refetch events list
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
-
       // Update the specific event in cache
       queryClient.setQueryData(eventKeys.detail(updatedEvent.id), updatedEvent);
+      // IMPORTANT: Invalidate registration cache for this event
+      // This ensures "7 / 12" updates to "7 / 15" when maxAttendees changes
+      queryClient.invalidateQueries({
+        queryKey: registrationKeys.byEvent(updatedEvent.id),
+      });
     },
     onError: (error) => {
       console.error("Failed to update event:", error);

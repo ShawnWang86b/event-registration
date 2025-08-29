@@ -10,34 +10,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { EVENT_FORM_CONSTANTS } from "@/constants/eventForm";
+import { withErrorBoundary } from "@/components/ErrorBoundary";
 
-interface CreateEventDialogProps {
+type CreateEventDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-}
+};
 
-export default function CreateEventDialog({
-  isOpen,
-  onClose,
-}: CreateEventDialogProps) {
+const CreateEventDialog = ({ isOpen, onClose }: CreateEventDialogProps) => {
   const createEventMutation = useCreateEvent();
 
   const handleSubmit = async (data: EventFormData) => {
     try {
-      await createEventMutation.mutateAsync({
-        title: data.title,
-        description: data.description,
-        price: data.price,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        location: data.location,
-        isPeriodic: data.isPeriodic,
-        frequency: data.frequency,
-        maxAttendees: data.maxAttendees,
-      });
+      // Use spread operator to pass all fields cleanly
+      await createEventMutation.mutateAsync(data);
       onClose();
     } catch (error) {
       console.error("Failed to create event:", error);
+      // Note: Error handling can be improved with toast notifications
     }
   };
 
@@ -57,9 +48,19 @@ export default function CreateEventDialog({
           onSubmit={handleSubmit}
           isLoading={createEventMutation.isPending}
           onCancel={onClose}
-          submitText="Create Event"
+          submitText={EVENT_FORM_CONSTANTS.BUTTONS.CREATE_EVENT}
         />
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+// Export with error boundary
+const CreateEventDialogWithErrorBoundary = withErrorBoundary(
+  CreateEventDialog,
+  <div className="p-4 text-center text-red-600">
+    Failed to load create event form. Please try again.
+  </div>
+);
+
+export default CreateEventDialogWithErrorBoundary;

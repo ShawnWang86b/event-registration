@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 
-// Create axios instance with base configuration
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
   timeout: 10000,

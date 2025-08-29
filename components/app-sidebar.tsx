@@ -1,5 +1,5 @@
 "use client";
-import { Calendar, Home, Shield, User } from "lucide-react";
+import { Calendar, Home, Shield, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -33,6 +33,11 @@ const baseItems = [
     title: "Account",
     url: "/account",
     icon: User,
+  },
+  {
+    title: "Shop",
+    url: "/shop",
+    icon: ShoppingBag,
   },
 ];
 

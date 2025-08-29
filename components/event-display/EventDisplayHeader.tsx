@@ -6,10 +6,6 @@ type EventDisplayHeaderProps = {
   onCreateClick: () => void;
 };
 
-/**
- * Header component for EventDisplay
- * Contains title, subtitle, and admin create button
- */
 export const EventDisplayHeader = ({
   isAdmin,
   onCreateClick,
@@ -25,7 +21,6 @@ export const EventDisplayHeader = ({
         </p>
       </div>
 
-      {/* Admin-only Create Event Button */}
       {isAdmin && (
         <button
           onClick={onCreateClick}

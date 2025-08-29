@@ -1,20 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { eventFormSchema, EventFormData } from "@/lib/schemas";
-import { Event } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -31,15 +20,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ChevronDownIcon } from "lucide-react";
-import {
-  formatDateTimeLocal,
-  parseDateTimeLocal,
-  updateDateTimeDate,
-  updateDateTimeTime,
-  formatDisplayDate,
-  formatDisplayTime,
-} from "@/utils/dateTime";
+import { EventFormData } from "@/lib/schemas";
+import { Event } from "@/lib/types";
+import { useEventForm } from "@/hooks/use-event-form";
+import { EVENT_FORM_CONSTANTS } from "@/constants/eventForm";
+import { DateTimePicker } from "@/components/form/DateTimePicker";
 
 type EventFormProps = {
   event?: Event;
@@ -54,46 +39,14 @@ export default function EventForm({
   onSubmit,
   isLoading = false,
   onCancel,
-  submitText = "Save Event",
+  submitText = EVENT_FORM_CONSTANTS.BUTTONS.SAVE_EVENT,
 }: EventFormProps) {
-  const [startDateOpen, setStartDateOpen] = useState(false);
-  const [endDateOpen, setEndDateOpen] = useState(false);
-
-  const form = useForm<EventFormData>({
-    resolver: zodResolver(eventFormSchema),
-    defaultValues: {
-      title: event?.title || "",
-      description: event?.description || "",
-      price: event?.price ? parseFloat(event.price) : 0,
-      startDate: event?.startDate ? formatDateTimeLocal(event.startDate) : "",
-      endDate: event?.endDate ? formatDateTimeLocal(event.endDate) : "",
-      location: event?.location || "",
-      isPeriodic: event?.isPeriodic || false,
-      frequency: event?.frequency || "",
-      maxAttendees: event?.maxAttendees || 1,
-      isActive: event?.isActive ?? true,
-    },
-  });
-
-  const handleSubmit: SubmitHandler<EventFormData> = async (data) => {
-    // Convert datetime-local strings to UTC ISO strings
-    const processedData = {
-      ...data,
-      startDate: data.startDate ? parseDateTimeLocal(data.startDate) : "",
-      endDate: data.endDate ? parseDateTimeLocal(data.endDate) : "",
-    };
-    await onSubmit(processedData);
-  };
-
-  const handlePeriodicChange = (checked: boolean) => {
-    form.setValue("isPeriodic", checked);
-    if (!checked) {
-      form.setValue("frequency", "");
+  const { form, handleSubmit, handlePeriodicChange, isPeriodic } = useEventForm(
+    {
+      event,
+      onSubmit,
     }
-  };
-
-  // Watch the isPeriodic value from the form
-  const isPeriodic = form.watch("isPeriodic");
+  );
 
   return (
     <div className="space-y-6">
@@ -145,7 +98,6 @@ export default function EventForm({
                       value={field.value || ""}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // Allow empty string or valid number input
                         if (value === "" || !isNaN(Number(value))) {
                           field.onChange(value === "" ? 0 : parseFloat(value));
                         }
@@ -170,7 +122,6 @@ export default function EventForm({
                       value={field.value || ""}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // Allow empty string or valid number input
                         if (value === "" || !isNaN(Number(value))) {
                           field.onChange(value === "" ? 1 : parseInt(value));
                         }
@@ -183,193 +134,39 @@ export default function EventForm({
             />
           </div>
 
-          {/* Start Date and Time */}
-          <div className="space-y-4">
-            <FormLabel className="text-card-foreground">
-              Start Date & Time *
-            </FormLabel>
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-3">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => {
-                    const currentDate = field.value
-                      ? new Date(field.value)
-                      : undefined;
-                    return (
-                      <FormItem>
-                        <FormLabel className="px-1">Date</FormLabel>
-                        <Popover
-                          open={startDateOpen}
-                          onOpenChange={setStartDateOpen}
-                        >
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
-                              >
-                                {currentDate
-                                  ? formatDisplayDate(currentDate)
-                                  : "Select date"}
-                                <ChevronDownIcon className="h-4 w-4" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto overflow-hidden p-0"
-                            align="start"
-                          >
-                            <Calendar
-                              mode="single"
-                              selected={currentDate}
-                              captionLayout="dropdown"
-                              onSelect={(date) => {
-                                if (date) {
-                                  const newDateTime = updateDateTimeDate(
-                                    field.value,
-                                    date
-                                  );
-                                  field.onChange(newDateTime);
-                                }
-                                setStartDateOpen(false);
-                              }}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => {
-                    const currentTime = field.value
-                      ? formatDisplayTime(field.value)
-                      : "10:00";
-                    return (
-                      <FormItem>
-                        <FormLabel className="px-1">Time</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="time"
-                            value={currentTime}
-                            onChange={(e) => {
-                              const newDateTime = updateDateTimeTime(
-                                field.value,
-                                e.target.value
-                              );
-                              field.onChange(newDateTime);
-                            }}
-                            className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+          {/* Start Date and Time - Keep this abstraction, it's complex and reusable */}
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <DateTimePicker
+                label="Start Date & Time *"
+                value={field.value}
+                onChange={field.onChange}
+                defaultTime="10:00"
+                error={form.formState.errors.startDate?.message}
+                dateId="start-date-picker"
+                timeId="start-time-picker"
+              />
+            )}
+          />
 
           {/* End Date and Time */}
-          <div className="space-y-4">
-            <FormLabel>End Date & Time *</FormLabel>
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-3">
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => {
-                    const currentDate = field.value
-                      ? new Date(field.value)
-                      : undefined;
-                    return (
-                      <FormItem>
-                        <FormLabel className="px-1">Date</FormLabel>
-                        <Popover
-                          open={endDateOpen}
-                          onOpenChange={setEndDateOpen}
-                        >
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className="w-40 justify-between font-normal bg-card text-card-foreground border-accent"
-                              >
-                                {currentDate
-                                  ? formatDisplayDate(currentDate)
-                                  : "Select date"}
-                                <ChevronDownIcon className="h-4 w-4" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto overflow-hidden p-0"
-                            align="start"
-                          >
-                            <Calendar
-                              mode="single"
-                              selected={currentDate}
-                              captionLayout="dropdown"
-                              onSelect={(date) => {
-                                if (date) {
-                                  const newDateTime = updateDateTimeDate(
-                                    field.value,
-                                    date
-                                  );
-                                  field.onChange(newDateTime);
-                                }
-                                setEndDateOpen(false);
-                              }}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => {
-                    const currentTime = field.value
-                      ? formatDisplayTime(field.value)
-                      : "12:00";
-                    return (
-                      <FormItem>
-                        <FormLabel className="px-1">Time</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="time"
-                            value={currentTime}
-                            onChange={(e) => {
-                              const newDateTime = updateDateTimeTime(
-                                field.value,
-                                e.target.value
-                              );
-                              field.onChange(newDateTime);
-                            }}
-                            className="w-32 bg-card text-card-foreground appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <DateTimePicker
+                label="End Date & Time *"
+                value={field.value}
+                onChange={field.onChange}
+                defaultTime="12:00"
+                error={form.formState.errors.endDate?.message}
+                dateId="end-date-picker"
+                timeId="end-time-picker"
+              />
+            )}
+          />
 
           {/* Location */}
           <FormField
@@ -389,7 +186,7 @@ export default function EventForm({
             )}
           />
 
-          {/* Periodic Event Toggle */}
+          {/* Recurring Event Toggle */}
           <FormField
             control={form.control}
             name="isPeriodic"
@@ -476,7 +273,7 @@ export default function EventForm({
                 onClick={onCancel}
                 className="w-[120px] hover:cursor-pointer hover:bg-secondary/90"
               >
-                Cancel
+                {EVENT_FORM_CONSTANTS.BUTTONS.CANCEL}
               </Button>
             )}
             <Button
@@ -484,7 +281,7 @@ export default function EventForm({
               disabled={isLoading}
               className="w-[120px] bg-primary hover:bg-primary/90 text-primary-foreground hover:cursor-pointer"
             >
-              {isLoading ? "Saving..." : submitText}
+              {isLoading ? EVENT_FORM_CONSTANTS.BUTTONS.SAVING : submitText}
             </Button>
           </div>
         </form>

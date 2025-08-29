@@ -1,11 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-services";
-import {
-  Registration,
-  CreateRegistrationData,
-  RegistrationsQueryParams,
-  EventRegistrationsResponse,
-} from "@/lib/types";
+import { CreateRegistrationData, RegistrationsQueryParams } from "@/lib/types";
 
 // Query keys
 export const registrationKeys = {

@@ -6,13 +6,9 @@ type EventGridProps = {
   onEventRegister?: (eventId: number) => void;
 };
 
-/**
- * Grid component for displaying events
- * Handles responsive layout and event card rendering
- */
 export const EventGrid = ({ events, onEventRegister }: EventGridProps) => {
   if (events.length === 0) {
-    return null; // Let parent handle empty state
+    return null;
   }
 
   return (

@@ -14,10 +14,6 @@ type EmptyStateProps = {
   className?: string;
 };
 
-/**
- * Reusable empty state component
- * Provides consistent empty state UI with optional actions
- */
 export const EmptyState = ({
   title = "No events found",
   message = "There are no events available at the moment. Check back later or create a new event.",

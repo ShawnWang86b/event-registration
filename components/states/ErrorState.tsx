@@ -13,10 +13,6 @@ type ErrorStateProps = {
   details?: string;
 };
 
-/**
- * Reusable error state component
- * Provides consistent error UI with retry functionality
- */
 export const ErrorState = ({
   message,
   errorType = "unknown",

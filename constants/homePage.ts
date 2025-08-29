@@ -1,4 +1,4 @@
-import { Calendar, Users, Trophy, type LucideIcon } from "lucide-react";
+import { Calendar, Users, Trophy } from "lucide-react";
 import { GalleryImage, Feature } from "@/types/homePage";
 
 export const galleryImages: GalleryImage[] = [

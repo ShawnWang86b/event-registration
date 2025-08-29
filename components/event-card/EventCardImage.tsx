@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { EVENT_CARD_CONSTANTS } from "@/constants/eventCard";
 
 type EventCardImageProps = {
   imageSrc: string;
