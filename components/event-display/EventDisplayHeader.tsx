@@ -1,5 +1,10 @@
-import { CalendarPlus } from "lucide-react";
-import { EVENT_DISPLAY_CONSTANTS } from "@/constants/eventDisplay";
+import { Calendar, CalendarPlus, LayoutGrid } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  useDisplayMode,
+  useSetDisplayMode,
+  type EventDisplayMode,
+} from "@/store";
 
 type EventDisplayHeaderProps = {
   isAdmin: boolean;
@@ -10,29 +15,46 @@ export const EventDisplayHeader = ({
   isAdmin,
   onCreateClick,
 }: EventDisplayHeaderProps) => {
-  return (
-    <div className="flex items-start justify-between mb-8">
-      <div>
-        <h1 className="text-3xl font-bold text-secondary-foreground">
-          {EVENT_DISPLAY_CONSTANTS.TEXT.TITLE}
-        </h1>
-        <p className="text-primary text-lg mt-2">
-          {EVENT_DISPLAY_CONSTANTS.TEXT.SUBTITLE}
-        </p>
-      </div>
+  const displayMode = useDisplayMode();
+  const setDisplayMode = useSetDisplayMode();
 
+  const handleModeClick = (mode: EventDisplayMode) => {
+    setDisplayMode(mode);
+  };
+
+  return (
+    <div className="flex items-center justify-start mb-8 gap-2">
       {isAdmin && (
-        <button
+        <Button
           onClick={onCreateClick}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-sm p-4 rounded-full transition-colors hover:cursor-pointer"
-          aria-label={EVENT_DISPLAY_CONSTANTS.CREATE_BUTTON.ARIA_LABEL}
-          type="button"
+          size="icon"
+          className="flex items-center bg-primary hover:bg-primary/90 text-primary-foreground transition-colors hover:cursor-pointer"
+          aria-label="Create new event"
         >
-          <CalendarPlus
-            size={EVENT_DISPLAY_CONSTANTS.CREATE_BUTTON.ICON_SIZE}
-          />
-        </button>
+          <CalendarPlus size={16} />
+        </Button>
       )}
+      <div className="flex items-center gap-2">
+        <Button
+          variant={displayMode === "grid" ? "default" : "outline"}
+          size="icon"
+          className="cursor-pointer"
+          onClick={() => handleModeClick("grid")}
+          aria-label="Grid view"
+        >
+          <LayoutGrid size={16} />
+        </Button>
+
+        <Button
+          variant={displayMode === "calendar" ? "default" : "outline"}
+          size="icon"
+          className="cursor-pointer"
+          onClick={() => handleModeClick("calendar")}
+          aria-label="Calendar view"
+        >
+          <Calendar size={16} />
+        </Button>
+      </div>
     </div>
   );
 };

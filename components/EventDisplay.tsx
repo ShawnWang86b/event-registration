@@ -3,7 +3,9 @@
 import CreateEventDialog from "@/components/CreateEvent";
 import { LoadingState, ErrorState, EmptyState } from "@/components/states";
 import { EventDisplayHeader, EventGrid } from "@/components/event-display";
+import EventCalendar from "@/components/EventCalendar";
 import { useEventDisplay } from "@/hooks/use-event-display";
+import { useDisplayMode } from "@/store";
 import { EVENT_DISPLAY_CONSTANTS } from "@/constants/eventDisplay";
 import { withErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -21,6 +23,8 @@ const EventDisplay = () => {
     handleEventRegister,
     emptyStateAction,
   } = useEventDisplay();
+
+  const displayMode = useDisplayMode();
 
   // Render different states
   switch (displayState) {
@@ -50,13 +54,23 @@ const EventDisplay = () => {
     case "success":
     default:
       return (
-        <div className="min-h-screen min-w-[80vw] lg:w-auto p-16">
+        <div className="pt-8">
           <EventDisplayHeader
             isAdmin={isAdmin}
             onCreateClick={handleCreateClick}
           />
 
-          <EventGrid events={events} onEventRegister={handleEventRegister} />
+          {displayMode === "grid" ? (
+            <EventGrid events={events} onEventRegister={handleEventRegister} />
+          ) : (
+            <div className="pt-4">
+              <EventCalendar
+                events={events}
+                isAdmin={isAdmin}
+                onCreateClick={handleCreateClick}
+              />
+            </div>
+          )}
 
           {/* Create Event Dialog */}
           <CreateEventDialog

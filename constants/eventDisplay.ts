@@ -11,11 +11,6 @@ export const EVENT_DISPLAY_CONSTANTS = {
     GENERIC_ERROR: "Something went wrong while loading events",
     NETWORK_ERROR: "Network error. Please check your connection.",
   },
-
-  CREATE_BUTTON: {
-    ICON_SIZE: 16,
-    ARIA_LABEL: "Create new event",
-  },
 } as const;
 
 export type EventDisplayState = "loading" | "error" | "empty" | "success";

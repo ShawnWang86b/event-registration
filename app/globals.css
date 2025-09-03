@@ -190,3 +190,8 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+/* react-big-calendar */
+.rbc-header {
+  @apply bg-secondary;
+}

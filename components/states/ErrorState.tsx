@@ -39,7 +39,7 @@ export const ErrorState = ({
   };
 
   const errorMessage = getErrorMessage();
-
+  //FIXME: Add a nice error state
   return (
     <div
       className={`flex justify-center items-center p-8 ${heightClass} ${widthClass} ${className}`}

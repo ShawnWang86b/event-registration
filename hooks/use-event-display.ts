@@ -1,3 +1,4 @@
+"use client";
 import { useState, useMemo, useCallback } from "react";
 import { useEvents } from "@/hooks/use-events";
 import { useCurrentUser } from "@/hooks";
