@@ -108,7 +108,7 @@ export const PWAInstallPrompt = () => {
 
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm text-foreground">
-              Install Event Registration App
+              Install Old Boy Hoops App
             </h3>
             <p className="text-xs text-muted-foreground mt-1">
               {isIOS

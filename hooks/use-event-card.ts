@@ -5,16 +5,17 @@ import { Event } from "@/types";
 import { LOCATION_IMAGE_MAP } from "@/constants/eventCard";
 import type { EventStatus, ButtonState } from "@/constants/eventCard";
 
-interface UseEventCardProps {
+type UseEventCardProps = {
   event: Event;
   onRegister?: (eventId: number) => void;
-}
+};
 
-interface EventCardState {
+type EventCardState = {
   isRegistrationExpanded: boolean;
   isEditDialogOpen: boolean;
   isSetPriceDialogOpen: boolean;
-}
+  isResetDialogOpen: boolean;
+};
 
 /**
  * Custom hook to manage EventCard logic and state
@@ -26,6 +27,7 @@ export const useEventCard = ({ event, onRegister }: UseEventCardProps) => {
     isRegistrationExpanded: false,
     isEditDialogOpen: false,
     isSetPriceDialogOpen: false,
+    isResetDialogOpen: false,
   });
 
   // Data fetching
@@ -88,6 +90,10 @@ export const useEventCard = ({ event, onRegister }: UseEventCardProps) => {
     setState((prev) => ({ ...prev, isSetPriceDialogOpen: open }));
   }, []);
 
+  const toggleResetDialog = useCallback((open: boolean) => {
+    setState((prev) => ({ ...prev, isResetDialogOpen: open }));
+  }, []);
+
   const toggleRegistrationDialog = useCallback((open: boolean) => {
     setState((prev) => ({ ...prev, isRegistrationExpanded: open }));
   }, []);
@@ -131,6 +137,7 @@ export const useEventCard = ({ event, onRegister }: UseEventCardProps) => {
     toggleEditDialog,
     toggleSetPriceDialog,
     toggleRegistrationDialog,
+    toggleResetDialog,
 
     // Utility functions
     getLocationImage,

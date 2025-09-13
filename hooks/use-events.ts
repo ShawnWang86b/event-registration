@@ -104,16 +104,29 @@ export const useEndEvent = () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
       queryClient.invalidateQueries({ queryKey: ["registrations"] });
       queryClient.invalidateQueries({ queryKey: ["admin"] });
-
-      // Log success
-      console.log("Event ended successfully:", data.summary);
     },
     onError: (error: any) => {
       console.error("Failed to end event:", error);
     },
   });
 };
+// reset event mutation (admin only)
+export const useResetEvent = () => {
+  const queryClient = useQueryClient();
 
+  return useMutation({
+    mutationFn: (eventId: number) => api.events.resetEvent(eventId),
+    onSuccess: (data, eventId) => {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (error: any) => {
+      console.error("Failed to reset event:", error);
+    },
+  });
+};
 // Toggle event status mutation (admin only)
 export const useToggleEventStatus = () => {
   const queryClient = useQueryClient();
@@ -132,12 +145,6 @@ export const useToggleEventStatus = () => {
 
       // Update the specific event in cache
       queryClient.setQueryData(eventKeys.detail(updatedEvent.id), updatedEvent);
-
-      // Log success
-      console.log(
-        `Event ${updatedEvent.isActive ? "activated" : "deactivated"}:`,
-        updatedEvent.title
-      );
     },
     onError: (error: any) => {
       console.error("Failed to toggle event status:", error);
@@ -163,14 +170,6 @@ export const useEndEventWithPrices = () => {
       queryClient.invalidateQueries({ queryKey: ["registrations"] });
       queryClient.invalidateQueries({ queryKey: ["admin"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-
-      // Log success with summary
-      console.log("Event ended successfully with individual prices:", {
-        eventId,
-        summary: result.summary,
-        customPricesUsed: result.summary.customPriceUsed,
-        totalCollected: result.summary.totalDeducted,
-      });
     },
     onError: (error: any) => {
       console.error("Failed to end event with individual prices:", error);

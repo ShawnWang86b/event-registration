@@ -23,6 +23,7 @@ import {
   EventCardRegisterButton,
 } from "@/components/event-card";
 import { withErrorBoundary } from "@/components/ErrorBoundary";
+import ResetEventDialog from "./ResetEvent";
 
 type EventCardProps = {
   event: Event;
@@ -49,6 +50,7 @@ const EventCard = ({
     handleRegisterClick,
     toggleEditDialog,
     toggleSetPriceDialog,
+    toggleResetDialog,
     toggleRegistrationDialog,
     getLocationImage,
     formatPrice,
@@ -60,13 +62,14 @@ const EventCard = ({
         {/* Header with close button when externally expanded */}
         <EventCardHeader isExpanded={externalExpanded} onClose={onClose} />
 
-        <div className="p-6">
+        <div className="p-4 lg:p-6">
           {/* Admin Actions Bar */}
           <EventCardAdminActions
             event={event}
             isAdmin={isAdmin}
             onEditClick={() => toggleEditDialog(true)}
             onSetPriceClick={() => toggleSetPriceDialog(true)}
+            onResetClick={() => toggleResetDialog(true)}
           />
 
           {/* Event Image with Title and Description Overlay */}
@@ -169,6 +172,13 @@ const EventCard = ({
         event={event}
         isOpen={state.isSetPriceDialogOpen}
         onClose={() => toggleSetPriceDialog(false)}
+      />
+
+      {/* Reset Event Dialog */}
+      <ResetEventDialog
+        event={event}
+        isOpen={state.isResetDialogOpen}
+        onClose={() => toggleResetDialog(false)}
       />
     </>
   );

@@ -87,6 +87,18 @@ export const eventsApi = {
     }
   },
 
+  // Reset event (admin only)
+  resetEvent: async (
+    eventId: number
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.post(`/events/${eventId}/reset`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
   // End event with individual prices (admin only)
   endEventWithPrices: async (
     eventId: number,

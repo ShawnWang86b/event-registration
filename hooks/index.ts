@@ -7,6 +7,7 @@ export {
   useUpdateEvent,
   useDeleteEvent,
   useEndEvent,
+  useResetEvent,
   eventKeys,
 } from "./use-events";
 export {

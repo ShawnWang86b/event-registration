@@ -15,6 +15,7 @@ export const EVENT_CARD_CONSTANTS = {
   BUTTONS: {
     EDIT: "Edit",
     SET_PRICE: "Set Price",
+    RESET: "Reset",
     LOADING: "Loading...",
     VIEW_DETAILS: "View Event Details",
     REGISTER: "Register for this event",

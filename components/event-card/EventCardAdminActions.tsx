@@ -6,6 +6,7 @@ type EventCardAdminActionsProps = {
   isAdmin: boolean;
   onEditClick: () => void;
   onSetPriceClick: () => void;
+  onResetClick: () => void;
 };
 
 export const EventCardAdminActions = ({
@@ -13,14 +14,15 @@ export const EventCardAdminActions = ({
   isAdmin,
   onEditClick,
   onSetPriceClick,
+  onResetClick,
 }: EventCardAdminActionsProps) => {
   if (!isAdmin) return null;
 
   return (
-    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+    <div className="mb-4 p-2 lg:p-3 bg-blue-50 border border-blue-200 rounded-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center text-primary">
-          <span className="text-sm font-medium">
+          <span className="text-xs lg:text-sm font-medium pr-2 lg:pr-0">
             {EVENT_CARD_CONSTANTS.LABELS.ADMIN_ACTIONS}
           </span>
         </div>
@@ -38,6 +40,15 @@ export const EventCardAdminActions = ({
               className="cursor-pointer bg-secondary hover:bg-secondary/90 text-white text-xs px-3 py-1 rounded-md transition-colors font-medium"
             >
               {EVENT_CARD_CONSTANTS.BUTTONS.SET_PRICE}
+            </button>
+          )}
+
+          {event.isActive && (
+            <button
+              onClick={onResetClick}
+              className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-md transition-colors font-medium"
+            >
+              {EVENT_CARD_CONSTANTS.BUTTONS.RESET}
             </button>
           )}
         </div>

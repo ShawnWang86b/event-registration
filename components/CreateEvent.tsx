@@ -34,7 +34,7 @@ const CreateEventDialog = ({ isOpen, onClose }: CreateEventDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card sm:max-w-sm md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-card-foreground">
             Create New Event

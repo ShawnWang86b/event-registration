@@ -54,7 +54,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
   if (dataLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
+        <DialogContent className="p-4! bg-card sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Set Individual Prices</DialogTitle>
             <DialogDescription>Loading registered users...</DialogDescription>
@@ -72,7 +72,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
   if (hasError) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="p-4! bg-card sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Set Individual Prices</DialogTitle>
             <DialogDescription>
@@ -97,7 +97,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
   if (hasNoUsers) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="p-4! bg-card sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Set Individual Prices</DialogTitle>
             <DialogDescription>
@@ -122,7 +122,7 @@ const SetPriceDialog = ({ event, isOpen, onClose }: SetPriceDialogProps) => {
   // Main dialog
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <DialogContent className="p-4! bg-card sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex flex-col lg:flex-row items-center gap-3">
             {currentStep === 1 ? "Set Individual Prices" : "Confirm End Event"}
