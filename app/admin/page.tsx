@@ -29,7 +29,7 @@ export default function AdminPage() {
   } = useAdminBalance();
 
   return (
-    <div className="min-h-screen min-w-[80vw] lg:w-auto p-0 pt-10 lg:p-16">
+    <div className="min-h-screen min-w-[90vw] lg:min-w-[80vw] p-0 pt-10 lg:p-16">
       <div className="mb-8">
         <h1 className="text-lg lg:text-3xl font-bold mb-2 text-secondary-foreground">
           Admin Panel
@@ -40,7 +40,7 @@ export default function AdminPage() {
       </div>
 
       {/* Credit Balance Management Section */}
-      <Card className="mb-8 w-[90vw]">
+      <Card className="mb-8 w-[90vw] lg:w-auto">
         <CardHeader>
           <CardTitle className="text-foreground text-lg">
             Manage User Credit Balances

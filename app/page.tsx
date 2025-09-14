@@ -8,7 +8,7 @@ import { features, galleryImages } from "@/constants/homePage";
 
 export default function Home() {
   return (
-    <div className="min-h-screen px-2 lg:px-16">
+    <div className="min-h-screen min-w-[90vw] lg:min-w-[80vw] px-2 lg:px-16">
       {/* Hero Section */}
       <section className="text-center py-16">
         {/* Logo */}
