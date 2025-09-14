@@ -8,7 +8,7 @@ import { features, galleryImages } from "@/constants/homePage";
 
 export default function Home() {
   return (
-    <div className="min-h-screen px-16">
+    <div className="min-h-screen px-2 lg:px-16">
       {/* Hero Section */}
       <section className="text-center py-16">
         {/* Logo */}
@@ -34,13 +34,13 @@ export default function Home() {
         <div className="flex gap-4 justify-center">
           <Link
             href="/events"
-            className="w-[200px] bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-lg transition-colors"
+            className="w-[150px] lg:w-[200px] bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-lg transition-colors"
           >
             View Events
           </Link>
           <Link
             href="/account"
-            className="w-[200px] border border-primary text-primary hover:bg-accent hover:text-primary-foreground py-3 px-6 rounded-lg transition-colors"
+            className="w-[150px] lg:w-[200px] border border-primary text-primary hover:bg-accent hover:text-primary-foreground py-3 px-6 rounded-lg transition-colors"
           >
             My Account
           </Link>
@@ -63,7 +63,7 @@ export default function Home() {
         </p>
         <Link
           href="/events"
-          className="w-[200px] bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-lg transition-colors"
+          className="w-[150px] lg:w-[200px] bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-lg transition-colors"
         >
           View Events
         </Link>

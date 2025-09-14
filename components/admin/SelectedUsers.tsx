@@ -25,7 +25,7 @@ export const SelectedUsers = ({
             <div>
               <div className="font-medium text-foreground">{user.name}</div>
               <div className="text-sm text-primary">{user.email}</div>
-              <div className="text-xs text-blue-600">
+              <div className="text-sm text-primary">
                 Balance: {user.creditBalance} credits
               </div>
             </div>

@@ -53,7 +53,7 @@ export const AccountSummary = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {summaryCards.map((card) => (
-        <Card key={card.title}>
+        <Card key={card.title} className="mr-4 lg:mr-0">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-medium text-primary">
               {card.title}

@@ -5,7 +5,7 @@ export const ACCOUNT_CONSTANTS = {
   },
 
   COLORS: {
-    POSITIVE: "text-green-600",
-    NEGATIVE: "text-red-600",
+    POSITIVE: "text-accent",
+    NEGATIVE: "text-accent",
   },
 } as const;

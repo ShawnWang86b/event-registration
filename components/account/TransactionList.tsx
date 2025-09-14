@@ -87,7 +87,7 @@ export const TransactionList = ({
               return (
                 <div
                   key={transaction.id}
-                  className="flex-col bg-card lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors"
+                  className="flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -95,7 +95,7 @@ export const TransactionList = ({
                         {transaction.description}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-primary">
+                    <div className="flex items-center gap-4 text-xs lg:text-sm text-primary">
                       <span>
                         {formatDateTime(transaction.createdAt.toString())}
                       </span>
@@ -108,7 +108,6 @@ export const TransactionList = ({
                       <span
                         className={`font-semibold tracking-wide ${amountInfo.color}`}
                       >
-                        {amountInfo.sign}
                         {amountInfo.amount}
                       </span>
                     </div>

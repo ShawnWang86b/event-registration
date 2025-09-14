@@ -43,14 +43,14 @@ export const EventCardAdminActions = ({
             </button>
           )}
 
-          {event.isActive && (
+          {/* {event.isActive && (
             <button
               onClick={onResetClick}
               className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-md transition-colors font-medium"
             >
               {EVENT_CARD_CONSTANTS.BUTTONS.RESET}
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>
