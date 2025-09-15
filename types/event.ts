@@ -12,6 +12,7 @@ export type Event = {
   maxAttendees: number;
   createdById: string;
   isActive: boolean;
+  isPublicVisible: boolean;
   createdAt: string | Date; // API returns string, but may be Date object in some contexts
   updatedAt: string | Date; // API returns string, but may be Date object in some contexts
 };

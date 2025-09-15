@@ -1,6 +1,6 @@
 export const EVENT_CARD_CONSTANTS = {
   LABELS: {
-    ADMIN_ACTIONS: "Admin Actions:",
+    ADMIN_ACTIONS: "Admin Tools:",
     EVENT_DETAILS: "Event Details",
     REGISTRATION_DETAILS: "Event Registration Details",
     EVENT_REGISTRATIONS: "Event Registrations",
@@ -27,6 +27,7 @@ export const EVENT_CARD_CONSTANTS = {
     FULL_SUFFIX: " (Full)",
     DEFAULT_REGISTRATIONS: "--",
     COMING_SOON: "Registration details shown below, coming soon...",
+    END_OF_EVENT: "Waiting for the event to be finalized",
   },
 
   DEFAULTS: {

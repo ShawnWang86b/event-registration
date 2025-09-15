@@ -4,8 +4,8 @@ import { db } from "@/db";
 import { eventsTable, usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-// PATCH /api/events/[eventId]/toggle
-// Admin endpoint to toggle event active/inactive status
+// PATCH /api/events/[eventId]/public-visible
+// Admin endpoint to toggle event public visibility
 export async function PATCH(request: Request, context: any) {
   try {
     const { userId: currentUserId } = await auth();
@@ -36,11 +36,11 @@ export async function PATCH(request: Request, context: any) {
 
     // Parse request body
     const body = await request.json();
-    const { isActive } = body;
+    const { isPublicVisible } = body;
 
-    if (typeof isActive !== "boolean") {
+    if (typeof isPublicVisible !== "boolean") {
       return NextResponse.json(
-        { error: "isActive must be a boolean value" },
+        { error: "isPublicVisible must be a boolean value" },
         { status: 400 }
       );
     }
@@ -60,28 +60,23 @@ export async function PATCH(request: Request, context: any) {
     const [updatedEvent] = await db
       .update(eventsTable)
       .set({
-        isActive,
+        isPublicVisible,
         updatedAt: new Date(),
       })
       .where(eq(eventsTable.id, eventIdNum))
       .returning();
 
-    // Log the action
-    console.log(
-      `Admin ${currentUserId} ${
-        isActive ? "activated" : "deactivated"
-      } event ${eventIdNum}: ${updatedEvent.title}`
-    );
-
     return NextResponse.json({
       success: true,
       event: updatedEvent,
-      message: `Event ${isActive ? "activated" : "deactivated"} successfully`,
+      message: `Event ${
+        isPublicVisible ? "publicly visible" : "not publicly visible"
+      } successfully`,
       toggledBy: currentUser[0].name,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error toggling event status:", error);
+    console.error("Error toggling event public visibility:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useEventRegistrations } from "@/hooks/use-registrations";
 import { useCurrentUser } from "@/hooks";
+import { useToggleEventPublicVisibility } from "@/hooks/use-events";
 import { Event } from "@/types";
 import { LOCATION_IMAGE_MAP } from "@/constants/eventCard";
 import type { EventStatus, ButtonState } from "@/constants/eventCard";
@@ -37,6 +38,9 @@ export const useEventCard = ({ event, onRegister }: UseEventCardProps) => {
     isLoading: loading,
     error,
   } = useEventRegistrations(event.id);
+
+  // Mutations
+  const togglePublicVisibilityMutation = useToggleEventPublicVisibility();
 
   // Computed values
   const isAdmin = useMemo(
@@ -98,6 +102,16 @@ export const useEventCard = ({ event, onRegister }: UseEventCardProps) => {
     setState((prev) => ({ ...prev, isRegistrationExpanded: open }));
   }, []);
 
+  const togglePublicVisibilityChange = useCallback(
+    (isPublicVisible: boolean) => {
+      togglePublicVisibilityMutation.mutate({
+        eventId: event.id,
+        isPublicVisible,
+      });
+    },
+    [togglePublicVisibilityMutation, event.id]
+  );
+
   // Utility functions
   const getLocationImage = useCallback(
     (location: string | null | undefined): string => {
@@ -138,6 +152,7 @@ export const useEventCard = ({ event, onRegister }: UseEventCardProps) => {
     toggleSetPriceDialog,
     toggleRegistrationDialog,
     toggleResetDialog,
+    togglePublicVisibilityChange,
 
     // Utility functions
     getLocationImage,

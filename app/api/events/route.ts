@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { eventsTable, usersTable, registrationsTable } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 // GET all events
 export async function GET(req: Request) {
@@ -12,10 +12,46 @@ export async function GET(req: Request) {
 
     // If no ID provided, return all events
     if (!id) {
-      const events = await db
-        .select()
-        .from(eventsTable)
-        .where(eq(eventsTable.isActive, true));
+      // Get current user to determine filtering
+      const { userId } = await auth();
+      let isAdmin = false;
+
+      if (userId) {
+        // Check if user is admin
+        const user = await db.query.usersTable.findFirst({
+          where: eq(usersTable.id, userId),
+        });
+        isAdmin = user?.role === "admin";
+      }
+
+      // Filter events based on user role
+      let events;
+      if (isAdmin) {
+        // Admins can see all active events
+        // Sort by isPublicVisible (true first), then by updatedAt (newest first)
+        events = await db
+          .select()
+          .from(eventsTable)
+          .where(eq(eventsTable.isActive, true))
+          .orderBy(
+            desc(eventsTable.isPublicVisible),
+            desc(eventsTable.updatedAt)
+          );
+      } else {
+        // Public users can only see active events that are publicly visible
+        // Sort by updatedAt (newest first)
+        events = await db
+          .select()
+          .from(eventsTable)
+          .where(
+            and(
+              eq(eventsTable.isActive, true),
+              eq(eventsTable.isPublicVisible, true)
+            )
+          )
+          .orderBy(desc(eventsTable.updatedAt));
+      }
+
       return NextResponse.json(events);
     }
 
@@ -25,11 +61,28 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Invalid event ID" }, { status: 400 });
     }
 
+    // Get current user to determine access
+    const { userId } = await auth();
+    let isAdmin = false;
+
+    if (userId) {
+      // Check if user is admin
+      const user = await db.query.usersTable.findFirst({
+        where: eq(usersTable.id, userId),
+      });
+      isAdmin = user?.role === "admin";
+    }
+
     const event = await db.query.eventsTable.findFirst({
       where: eq(eventsTable.id, eventId),
     });
 
     if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    // Check if user has permission to view this event
+    if (!isAdmin && !event.isPublicVisible) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 

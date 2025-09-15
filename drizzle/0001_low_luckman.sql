@@ -1,0 +1,1 @@
+ALTER TABLE "events" ADD COLUMN "is_public_visible" boolean DEFAULT true NOT NULL;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { registrationsTable, eventsTable } from "@/db/schema";
+import { registrationsTable, eventsTable, usersTable } from "@/db/schema";
 import { eq, and, count } from "drizzle-orm";
 
 // GET http://localhost:3000/api/registrations?eventId=1
@@ -84,6 +84,20 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (!event.length) {
+      return NextResponse.json(
+        { error: "Event not found or inactive" },
+        { status: 404 }
+      );
+    }
+
+    // Check if user has permission to register for this event
+    // Get user role to determine access
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.id, userId),
+    });
+    const isAdmin = user?.role === "admin";
+
+    if (!isAdmin && !event[0].isPublicVisible) {
       return NextResponse.json(
         { error: "Event not found or inactive" },
         { status: 404 }

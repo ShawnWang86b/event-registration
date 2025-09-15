@@ -1,5 +1,6 @@
 import { EVENT_CARD_CONSTANTS } from "@/constants/eventCard";
 import { Event } from "@/types";
+import { Switch } from "@/components/ui/switch";
 
 type EventCardAdminActionsProps = {
   event: Event;
@@ -7,6 +8,7 @@ type EventCardAdminActionsProps = {
   onEditClick: () => void;
   onSetPriceClick: () => void;
   onResetClick: () => void;
+  onPublicVisibilityChange: (isActive: boolean) => void;
 };
 
 export const EventCardAdminActions = ({
@@ -15,6 +17,7 @@ export const EventCardAdminActions = ({
   onEditClick,
   onSetPriceClick,
   onResetClick,
+  onPublicVisibilityChange,
 }: EventCardAdminActionsProps) => {
   if (!isAdmin) return null;
 
@@ -26,14 +29,13 @@ export const EventCardAdminActions = ({
             {EVENT_CARD_CONSTANTS.LABELS.ADMIN_ACTIONS}
           </span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={onEditClick}
             className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-md transition-colors font-medium"
           >
             {EVENT_CARD_CONSTANTS.BUTTONS.EDIT}
           </button>
-
           {event.isActive && (
             <button
               onClick={onSetPriceClick}
@@ -42,8 +44,12 @@ export const EventCardAdminActions = ({
               {EVENT_CARD_CONSTANTS.BUTTONS.SET_PRICE}
             </button>
           )}
-
-          {/* {event.isActive && (
+          <Switch
+            checked={event.isPublicVisible}
+            onCheckedChange={onPublicVisibilityChange}
+          />{" "}
+          Public event
+          {/* {event.isActive && (  
             <button
               onClick={onResetClick}
               className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-3 py-1 rounded-md transition-colors font-medium"

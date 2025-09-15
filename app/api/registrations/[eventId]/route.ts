@@ -5,10 +5,22 @@ import { registrationsTable, eventsTable, usersTable } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 // GET /api/registrations/:eventId
-// Get all registrations for a specific event (public access)
+// Get all registrations for a specific event (with access control)
 export async function GET(request: Request, context: any) {
   try {
     const { eventId } = await context.params;
+
+    // Get current user to determine access
+    const { userId } = await auth();
+    let isAdmin = false;
+
+    if (userId) {
+      // Check if user is admin
+      const user = await db.query.usersTable.findFirst({
+        where: eq(usersTable.id, userId),
+      });
+      isAdmin = user?.role === "admin";
+    }
 
     // Get event details
     const event = await db.query.eventsTable.findFirst({
@@ -16,6 +28,11 @@ export async function GET(request: Request, context: any) {
     });
 
     if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    // Check if user has permission to view this event
+    if (!isAdmin && !event.isPublicVisible) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 

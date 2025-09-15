@@ -118,9 +118,27 @@ export const eventsApi = {
     isActive: boolean
   ): Promise<Event> => {
     try {
-      const response = await apiClient.patch(`/events/${eventId}/toggle`, {
+      const response = await apiClient.patch(`/events/${eventId}/active`, {
         isActive,
       });
+      return response.data.event;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Toggle event public visibility (admin only)
+  toggleEventPublicVisibility: async (
+    eventId: number,
+    isPublicVisible: boolean
+  ): Promise<Event> => {
+    try {
+      const response = await apiClient.patch(
+        `/events/${eventId}/public-visible`,
+        {
+          isPublicVisible,
+        }
+      );
       return response.data.event;
     } catch (error) {
       throw handleApiError(error as AxiosError);

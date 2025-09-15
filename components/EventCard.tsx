@@ -24,6 +24,9 @@ import {
 } from "@/components/event-card";
 import { withErrorBoundary } from "@/components/ErrorBoundary";
 import ResetEventDialog from "./ResetEvent";
+import { useCallback, useMemo } from "react";
+import { MoveRight } from "lucide-react";
+import { Button } from "./ui/button";
 
 type EventCardProps = {
   event: Event;
@@ -52,13 +55,22 @@ const EventCard = ({
     toggleSetPriceDialog,
     toggleResetDialog,
     toggleRegistrationDialog,
+    togglePublicVisibilityChange,
     getLocationImage,
     formatPrice,
   } = useEventCard({ event, onRegister });
 
+  const isPublicVisible = useMemo(
+    () => event.isPublicVisible,
+    [event.isPublicVisible]
+  );
+
   return (
     <>
-      <div className="bg-card rounded-lg border-border border overflow-hidden">
+      <div
+        className={`bg-card rounded-lg border-border border overflow-hidden
+        }`}
+      >
         {/* Header with close button when externally expanded */}
         <EventCardHeader isExpanded={externalExpanded} onClose={onClose} />
 
@@ -70,6 +82,9 @@ const EventCard = ({
             onEditClick={() => toggleEditDialog(true)}
             onSetPriceClick={() => toggleSetPriceDialog(true)}
             onResetClick={() => toggleResetDialog(true)}
+            onPublicVisibilityChange={() =>
+              togglePublicVisibilityChange(!event.isPublicVisible)
+            }
           />
 
           {/* Event Image with Title and Description Overlay */}
@@ -90,11 +105,19 @@ const EventCard = ({
           />
 
           {/* Register button */}
-          <EventCardRegisterButton
-            buttonState={buttonState}
-            onClick={handleRegisterClick}
-            disabled={loading || !!error}
-          />
+          {isPublicVisible ? (
+            <EventCardRegisterButton
+              buttonState={buttonState}
+              onClick={handleRegisterClick}
+              disabled={loading || !!error}
+            />
+          ) : (
+            <div className="mt-4 pt-4">
+              <div className="h-12 text-lg text-foreground w-full flex items-center justify-center gap-2 bg-secondary font-medium py-2 px-4 rounded-md hover:cursor-not-allowed transition-colors">
+                {EVENT_CARD_CONSTANTS.STATUS.END_OF_EVENT}
+              </div>
+            </div>
+          )}
 
           {/* Expanded mode placeholder */}
           {externalExpanded && (

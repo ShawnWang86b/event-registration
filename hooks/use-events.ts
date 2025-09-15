@@ -127,6 +127,7 @@ export const useResetEvent = () => {
     },
   });
 };
+
 // Toggle event status mutation (admin only)
 export const useToggleEventStatus = () => {
   const queryClient = useQueryClient();
@@ -148,6 +149,31 @@ export const useToggleEventStatus = () => {
     },
     onError: (error: any) => {
       console.error("Failed to toggle event status:", error);
+    },
+  });
+};
+
+// Toggle event public visibility mutation (admin only)
+export const useToggleEventPublicVisibility = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      isPublicVisible,
+    }: {
+      eventId: number;
+      isPublicVisible: boolean;
+    }) => api.events.toggleEventPublicVisibility(eventId, isPublicVisible),
+    onSuccess: (updatedEvent) => {
+      // Invalidate and update queries
+      queryClient.invalidateQueries({ queryKey: eventKeys.all });
+
+      // Update the specific event in cache
+      queryClient.setQueryData(eventKeys.detail(updatedEvent.id), updatedEvent);
+    },
+    onError: (error: any) => {
+      console.error("Failed to toggle event public visibility:", error);
     },
   });
 };

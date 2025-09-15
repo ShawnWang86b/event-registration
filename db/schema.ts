@@ -60,6 +60,7 @@ export const eventsTable = pgTable("events", {
   createdById: varchar("created_by_id")
     .notNull()
     .references(() => usersTable.id),
+  isPublicVisible: boolean("is_public_visible").notNull().default(true),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

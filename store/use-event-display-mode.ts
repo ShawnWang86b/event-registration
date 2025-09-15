@@ -5,11 +5,11 @@ import { persist } from "zustand/middleware";
 export type EventDisplayMode = "grid" | "calendar";
 
 // Define the store interface
-interface EventDisplayModeState {
+type EventDisplayModeState = {
   displayMode: EventDisplayMode;
   setDisplayMode: (mode: EventDisplayMode) => void;
   toggleDisplayMode: () => void;
-}
+};
 
 // Create the Zustand store with persistence
 export const useEventDisplayMode = create<EventDisplayModeState>()(
