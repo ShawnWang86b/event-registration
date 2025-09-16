@@ -13,7 +13,7 @@ import {
 import { relations } from "drizzle-orm";
 
 // Enums
-export const roleEnum = pgEnum("role", ["admin", "user"]);
+export const roleEnum = pgEnum("role", ["admin", "user", "guest"]);
 export const registrationStatusEnum = pgEnum("registration_status", [
   "registered",
   "waitlist",

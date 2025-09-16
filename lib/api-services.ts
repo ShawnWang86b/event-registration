@@ -24,6 +24,9 @@ import {
   CreditTransactionsResponse,
   CreateTransactionData,
   CreditTransaction,
+  CreateGuestRegistrationData,
+  GuestRegistrationResponse,
+  GuestRegistrationsListResponse,
 } from "@/types";
 
 // Events API
@@ -336,6 +339,47 @@ export const adminApi = {
       const response = await apiClient.post(
         `/admin/users/${userId}/monthly-report`,
         data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Register a guest for an event (admin only)
+  registerGuest: async (
+    data: CreateGuestRegistrationData
+  ): Promise<GuestRegistrationResponse> => {
+    try {
+      const response = await apiClient.post("/admin/registrations/guest", data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Get all guest registrations (admin only)
+  getGuestRegistrations: async (
+    eventId?: number
+  ): Promise<GuestRegistrationsListResponse> => {
+    try {
+      const params = eventId ? { eventId: eventId.toString() } : {};
+      const response = await apiClient.get("/admin/registrations/guest", {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Delete a guest registration (admin only)
+  deleteGuestRegistration: async (
+    registrationId: number
+  ): Promise<{ message: string; deletedRegistration: any }> => {
+    try {
+      const response = await apiClient.delete(
+        `/admin/registrations/guest?registrationId=${registrationId}`
       );
       return response.data;
     } catch (error) {

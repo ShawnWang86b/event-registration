@@ -5,14 +5,17 @@ type UserCardProps = {
   user: {
     id: number;
     userId: string;
-    user: { name: string; email: string };
+    user: { name: string; email: string; role?: string };
     registrationDate: string;
   };
   index: number;
   isWaitlist?: boolean;
   isCurrentUser: boolean;
+  isAdmin?: boolean; // New prop to identify admin users
   onCancel: () => void;
+  onDeleteGuest?: () => void; // New prop for guest deletion
   isCanceling: boolean;
+  isDeletingGuest?: boolean; // New prop for guest deletion loading state
 };
 
 export const UserCard = ({
@@ -20,8 +23,11 @@ export const UserCard = ({
   index,
   isWaitlist = false,
   isCurrentUser,
+  isAdmin = false,
   onCancel,
+  onDeleteGuest,
   isCanceling,
+  isDeletingGuest = false,
 }: UserCardProps) => {
   const cardStyles = isWaitlist
     ? "bg-yellow-50 border-yellow-200"
@@ -36,6 +42,13 @@ export const UserCard = ({
   const emailStyles = isWaitlist ? "text-gray-600" : "text-primary";
 
   const numberText = isWaitlist ? `W${index + 1}` : `${index + 1}`;
+
+  // Check if this is a guest user
+  const isGuest = user.user.role === "guest";
+
+  // Show delete button for guests (admin only) or cancel button for current user
+  const showDeleteButton = isAdmin && isGuest && onDeleteGuest;
+  const showCancelButton = isCurrentUser && !isGuest;
 
   return (
     <div
@@ -61,7 +74,28 @@ export const UserCard = ({
             {formatDisplayDate(user.registrationDate)}
           </div>
         )}
-        {isCurrentUser && (
+
+        {/* Guest badge */}
+        {isGuest && (
+          <div className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+            Guest
+          </div>
+        )}
+
+        {/* Delete button for guests (admin only) */}
+        {showDeleteButton && (
+          <button
+            onClick={onDeleteGuest}
+            disabled={isDeletingGuest}
+            className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white p-2 rounded-full transition-colors"
+            title={isDeletingGuest ? "Deleting..." : "Delete guest"}
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
+
+        {/* Cancel button for current user (non-guests) */}
+        {showCancelButton && (
           <button
             onClick={onCancel}
             disabled={isCanceling}

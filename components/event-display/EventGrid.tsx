@@ -12,7 +12,7 @@ export const EventGrid = ({ events, onEventRegister }: EventGridProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-6 mr-2">
       {events.map((event) => (
         <EventCard key={event.id} event={event} onRegister={onEventRegister} />
       ))}

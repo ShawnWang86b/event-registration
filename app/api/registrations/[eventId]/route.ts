@@ -53,7 +53,8 @@ export async function GET(request: Request, context: any) {
           id: usersTable.id,
           name: usersTable.name,
           email: usersTable.email,
-          // Don't expose sensitive user data like role and creditBalance to public
+          // Include role for admins to identify guests
+          ...(isAdmin && { role: usersTable.role }),
         },
         event: {
           id: eventsTable.id,

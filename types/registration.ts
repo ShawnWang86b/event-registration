@@ -70,3 +70,21 @@ export type EventRegistrationsResponse = {
   };
   registrations: EventRegistration[];
 };
+
+// Admin Guest Registration Types
+export type CreateGuestRegistrationData = {
+  eventId: number;
+  guestName: string;
+};
+
+export type GuestRegistrationResponse = {
+  registration: EventRegistration;
+  user: EventRegistrationsUser;
+  isNewUser: boolean;
+  message: string;
+};
+
+export type GuestRegistrationsListResponse = {
+  guestRegistrations: EventRegistration[];
+  count: number;
+};

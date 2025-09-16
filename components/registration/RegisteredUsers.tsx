@@ -3,22 +3,28 @@ import { UserCard } from "./UserCard";
 type Registration = {
   id: number;
   userId: string;
-  user: { name: string; email: string };
+  user: { name: string; email: string; role?: string };
   registrationDate: string;
 };
 
 type RegisteredUsersProps = {
   users: Registration[];
   currentUserId: string | null | undefined;
+  isAdmin?: boolean;
   onCancelRegistration: () => void;
+  onDeleteGuest?: (registrationId: number) => void;
   isCanceling: boolean;
+  isDeletingGuest?: boolean;
 };
 
 export const RegisteredUsers = ({
   users,
   currentUserId,
+  isAdmin = false,
   onCancelRegistration,
+  onDeleteGuest,
   isCanceling,
+  isDeletingGuest = false,
 }: RegisteredUsersProps) => {
   return (
     <div className="mb-6">
@@ -31,8 +37,13 @@ export const RegisteredUsers = ({
               user={registration}
               index={index}
               isCurrentUser={registration.userId === currentUserId}
+              isAdmin={isAdmin}
               onCancel={onCancelRegistration}
+              onDeleteGuest={
+                onDeleteGuest ? () => onDeleteGuest(registration.id) : undefined
+              }
               isCanceling={isCanceling}
+              isDeletingGuest={isDeletingGuest}
             />
           ))}
         </div>

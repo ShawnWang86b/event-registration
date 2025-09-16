@@ -22,11 +22,14 @@ const RegistrationList = ({
     waitlistUsers,
     userId,
     isUserRegistered,
+    isAdmin,
     handleJoinEvent,
     handleCancelRegistration,
+    handleDeleteGuest,
     isLoading,
     isJoining,
     isCanceling,
+    isDeletingGuest,
     errorMessage,
     hasError,
     hasData,
@@ -109,16 +112,22 @@ const RegistrationList = ({
       <RegisteredUsers
         users={registeredUsers}
         currentUserId={userId}
+        isAdmin={isAdmin}
         onCancelRegistration={handleCancelRegistration}
+        onDeleteGuest={handleDeleteGuest}
         isCanceling={isCanceling}
+        isDeletingGuest={isDeletingGuest}
       />
 
       {/* Waitlist Users */}
       <WaitlistUsers
         users={waitlistUsers}
         currentUserId={userId}
+        isAdmin={isAdmin}
         onCancelRegistration={handleCancelRegistration}
+        onDeleteGuest={handleDeleteGuest}
         isCanceling={isCanceling}
+        isDeletingGuest={isDeletingGuest}
       />
     </div>
   );
