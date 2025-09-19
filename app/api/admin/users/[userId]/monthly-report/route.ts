@@ -298,15 +298,6 @@ export async function GET(request: Request, context: any) {
       generatedAt: new Date().toISOString(),
     };
 
-    // Log the report generation
-    console.log(
-      `Admin ${currentUserId} generated monthly report for user ${userId} for ${
-        monthNames[month - 1]
-      } ${year}. ${
-        summary.transactionCount
-      } transactions, net change: $${summary.netChange.toFixed(2)}`
-    );
-
     return NextResponse.json(monthlyReportResponse);
   } catch (error) {
     console.error("Error generating monthly report:", error);
@@ -472,10 +463,6 @@ export async function POST(request: Request, context: any) {
         .values(monthlyBalanceData)
         .returning();
     }
-
-    console.log(
-      `Admin ${currentUserId} created/updated monthly balance record for user ${userId} for ${month}/${year}`
-    );
 
     return NextResponse.json({
       success: true,

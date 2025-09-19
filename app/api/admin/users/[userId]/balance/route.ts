@@ -117,11 +117,6 @@ export async function PUT(request: Request, context: any) {
       return { updatedUser, transaction };
     });
 
-    // Log the transaction for additional audit trail
-    console.log(
-      `Admin ${currentUserId} ${action}ed ${amount} credits to user ${userId}. Transaction ID: ${result.transaction.id}`
-    );
-
     return NextResponse.json({
       success: true,
       user: {

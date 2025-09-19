@@ -31,7 +31,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen min-w-[90vw] lg:min-w-[80vw] p-0 pt-10 lg:p-16">
       <div className="mb-8">
-        <h1 className="text-lg lg:text-3xl font-bold mb-2 text-secondary-foreground">
+        <h1 className="text-lg lg:text-3xl font-bold mb-2 text-foreground">
           Admin Panel
         </h1>
         <p className="text-primary text-sm lg:text-lg">

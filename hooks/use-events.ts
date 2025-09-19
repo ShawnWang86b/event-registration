@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-services";
 import {
   CreateEventData,
+  CopyEventData,
   UpdateEventData,
   EventsQueryParams,
   EndEventWithPricesData,
@@ -50,6 +51,24 @@ export const useCreateEvent = () => {
     },
     onError: (error) => {
       console.error("Failed to create event:", error);
+    },
+  });
+};
+
+// Copy event mutation
+export const useCopyEvent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CopyEventData) => api.events.copyEvent(data),
+    onSuccess: (newEvent) => {
+      // Invalidate and refetch events list
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+      // Add the new event to the cache
+      queryClient.setQueryData(eventKeys.detail(newEvent.id), newEvent);
+    },
+    onError: (error) => {
+      console.error("Failed to copy event:", error);
     },
   });
 };

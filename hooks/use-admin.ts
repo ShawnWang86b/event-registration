@@ -124,13 +124,6 @@ export const useCreateMonthlyBalance = () => {
       queryClient.invalidateQueries({
         queryKey: ["admin", "balance", userId],
       });
-
-      console.log("Monthly balance record created/updated:", {
-        userId,
-        year: data.year,
-        month: data.month,
-        closingBalance: result.summary.closingBalance,
-      });
     },
     onError: (error: any) => {
       console.error("Failed to create monthly balance record:", error);

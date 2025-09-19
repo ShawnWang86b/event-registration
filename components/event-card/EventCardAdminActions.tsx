@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { SquareMenu } from "lucide-react";
 import { GuestRegistrationDialog } from "@/components/admin/GuestRegistrationDialog";
+import { useTranslations } from "next-intl";
+import { useCopyEvent } from "@/hooks/use-events";
 
 type EventCardAdminActionsProps = {
   event: Event;
@@ -38,9 +40,11 @@ export const EventCardAdminActions = ({
   onResetClick,
   onPublicVisibilityChange,
 }: EventCardAdminActionsProps) => {
-  // All hooks must be called before any conditional returns
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isGuestRegistrationOpen, setIsGuestRegistrationOpen] = useState(false);
+  const { mutate: copyEvent } = useCopyEvent();
+  const t = useTranslations("EventsPage.adminActions");
+
   const [position, setPosition] = useState(
     event.isPublicVisible ? "public" : "admin-only"
   );
@@ -68,6 +72,25 @@ export const EventCardAdminActions = ({
     onResetClick();
   };
 
+  const handleCopyClick = () => {
+    setIsDropdownOpen(false);
+    copyEvent(
+      {
+        eventId: event.id,
+      },
+      {
+        onSuccess: (copiedEvent) => {
+          console.log("Event copied successfully:", copiedEvent);
+          // You can add toast notification here if you have one set up
+        },
+        onError: (error) => {
+          console.error("Failed to copy event:", error);
+          // You can add toast notification here if you have one set up
+        },
+      }
+    );
+  };
+
   const handleVisibilityChange = (value: string) => {
     const isPublicVisible = value === "public";
     setPosition(value);
@@ -90,16 +113,21 @@ export const EventCardAdminActions = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="start">
-            <DropdownMenuLabel>Event</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("event.title")}</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleEditClick}>
-                Edit
+                {t("event.edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCopyClick}>
+                {t("event.copy")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSetPriceClick}>
-                Set Price
+                {t("event.setPrice")}
               </DropdownMenuItem>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Visibility</DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger>
+                  {t("event.visibility.title")}
+                </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioGroup
@@ -107,10 +135,10 @@ export const EventCardAdminActions = ({
                       onValueChange={handleVisibilityChange}
                     >
                       <DropdownMenuRadioItem value="public">
-                        Public
+                        {t("event.visibility.public")}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="admin-only">
-                        Admin Only
+                        {t("event.visibility.adminOnly")}
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
@@ -119,18 +147,20 @@ export const EventCardAdminActions = ({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Team</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("team.title")}</DropdownMenuLabel>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Add Guest</DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger>
+                  {t("team.addGuest")}
+                </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuItem onClick={handleRegisterGuestClick}>
-                      Register Guest
+                      {t("team.addGuest")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => console.log("View Guests")}
                     >
-                      View Guests
+                      {t("team.viewGuests")}
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
@@ -138,9 +168,9 @@ export const EventCardAdminActions = ({
             </DropdownMenuGroup>
             <DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Danger Zone</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("dangerZone.title")}</DropdownMenuLabel>
               <DropdownMenuItem onClick={handleResetClick}>
-                Reset Event
+                {t("dangerZone.reset")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

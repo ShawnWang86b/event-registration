@@ -1,0 +1,156 @@
+{
+    "SideBar": {
+        "title": "页面",
+        "home": "首页",
+        "events": "活动",
+        "account": "账户",
+        "shop": "商店",
+        "admin": "管理"
+    },
+    "HomePage": {
+        "title": "欢迎来到墨尔本老男孩篮球俱乐部",
+        "subtitle": "加入我们充满活力的篮球社区，在这里激情与竞争相遇。注册活动，与队友建立联系，并成为我们大家庭的一部分。",
+        "viewEvents": "查看活动",
+        "myAccount": "我的账户",
+        "WhyJoinUs": {
+            "title": "为什么加入我们？",
+            "regularEvents": {
+                "title": "常规活动",
+                "description": "每周游戏、锦标赛和训练课程，适合所有技能水平。"
+            },
+            "community": {
+                "title": "社区",
+                "description": "与热情的玩家建立联系，并在球场上和球场外建立持久的友谊。"
+            },
+            "competition": {
+                "title": "竞争",
+                "description": "参与组织联赛和锦标赛，测试您的技能。"
+            }
+        },
+        "ClubGallery": "俱乐部画廊",
+        "ReadyToJoin": {
+            "title": "准备加入我们吗？",
+            "subtitle": "查看我们的即将举行的活动并注册今天！"
+        }
+    },
+    "EventsPage": {
+        "title": "活动报名",
+        "subtitle": "发现并报名即将举行的篮球活动",
+        "eventDetails": {
+            "price": "价格:",
+            "date": "日期:",
+            "time": "时间:",
+            "location": "地点:",
+            "registrations": "报名人数:",
+            "frequency": "频率:"
+        },
+        "loading": "加载中...",
+        "error": "加载错误",
+        "full": "满员",
+        "default": "默认",
+        "comingSoon": "报名详情即将显示...",
+        "endOfEvent": "等待事件最终确定",
+        "eventCardButtons": {
+            "loading": "加载中...",
+            "viewDetails": "查看活动详情",
+            "register": "报名参加此活动",
+            "waitingForApproval": "等待管理员审核"
+        },
+        "adminActions": {
+            "event": {
+                "title": "活动",
+                "edit": "编辑",
+                "copy": "复制",
+                "setPrice": "结算价格",
+                "visibility": {
+                    "title": "可见性",
+                    "public": "公开",
+                    "adminOnly": "仅管理员"
+                }
+            },
+            "team": {
+                "title": "团队",
+                "addGuest": "添加散客",
+                "viewGuests": "查看散客"
+            },
+            "dangerZone": {
+                "title": "危险区域",
+                "reset": "重置活动"
+            },
+            "modal": {
+                "editModal": {
+                    "mainTitle": "编辑活动",
+                    "title": "标题",
+                    "description": "描述",
+                    "price": "价格",
+                    "maxAttendees": "最大报名人数",
+                    "startDateAndTime": {
+                        "title": "开始日期和时间",
+                        "startDate": "日期",
+                        "time": "时间"
+                    },
+                    "endDateAndTime": {
+                        "title": "结束日期和时间",
+                        "endDate": "日期",
+                        "time": "时间"
+                    },
+                    "location": "地点",
+                    "recurringEvent": {
+                        "title": "重复活动",
+                        "description": "启用如果此活动重复在计划上",
+                        "frequency": {
+                            "title": "频率",
+                            "description": "活动的频率"
+                        },
+                        "frequencyOptions": {
+                            "daily": "每日",
+                            "weekly": "每周",
+                            "monthly": "每月"
+                        }
+                    },
+                    "eventActive": {
+                        "title": "当前活动",
+                        "description": "当前的活动不会出现在公共活动列表中"
+                    }
+                }
+            }
+        },
+        "registrationDetails": {
+            "subtitle": "活动报名详情",
+            "date": "日期",
+            "time": "时间",
+            "location": "地点",
+            "registrationsListTitle": "活动报名",
+            "joinButton": {
+                "joinThisEvent": "报名参加此活动",
+                "isJoining": "报名中..."
+            },
+            "registeredAttendees": "已报名人数",
+            "waitlistUsers": "候补名单人数"
+        }
+    },
+    "AccountPage": {
+        "title": "账户仪表盘",
+        "subtitle": "管理您的账户并查看交易历史",
+        "cards": {
+            "currentBalance": "当前余额",
+            "totalTransactions": "总交易",
+            "recentTransactions": "最近交易",
+            "lastTransaction": "最后交易"
+        },
+        "tabs": {
+            "transactions": "最近交易",
+            "healthReports": "卡路里消耗"
+        },
+        "transactionHistory": {
+            "title": "交易明细",
+            "subtitle": "您的最近活动费用明细",
+            "noTransactions": "没有交易",
+            "loading": "加载交易...",
+            "error": "加载交易错误",
+            "retry": "重试",
+            "Amount": "金额",
+            "Balance": "账户钱包"
+        }
+    }
+}

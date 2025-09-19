@@ -1,0 +1,156 @@
+{
+    "SideBar": {
+        "title": "Pages",
+        "home": "Home",
+        "events": "Events",
+        "account": "Account",
+        "shop": "Shop",
+        "admin": "Admin"
+    },
+    "HomePage": {
+        "title": "Welcome to Melbourne Old Boys Hoops",
+        "subtitle": "Join our vibrant basketball community where passion meets competition. Register for events, connect with fellow players, and be part of something special.",
+        "viewEvents": "View Events",
+        "myAccount": "My Account",
+        "WhyJoinUs": {
+            "title": "Why Join Us?",
+            "regularEvents": {
+                "title": "Regular Events",
+                "description": "Weekly games, tournaments, and training sessions for all skill levels."
+            },
+            "community": {
+                "title": "Community",
+                "description": "Connect with passionate players and build lasting friendships on and off the court."
+            },
+            "competition": {
+                "title": "Competition",
+                "description": "Participate in organized leagues and tournaments to test your skills."
+            }
+        },
+        "ClubGallery": "Club Gallery",
+        "ReadyToJoin": {
+            "title": "Ready to Join?",
+            "subtitle": "Check out our upcoming events and register today!"
+        }
+    },
+    "EventsPage": {
+        "title": "Events",
+        "subtitle": "Discover and register for upcoming basketball events",
+        "eventDetails": {
+            "price": "Price:",
+            "date": "Date:",
+            "time": "Time:",
+            "location": "Location:",
+            "registrations": "Registrations:",
+            "frequency": "Frequency:"
+        },
+        "loading": "Loading...",
+        "error": "Error loading",
+        "full": "Full",
+        "default": "Default",
+        "comingSoon": "Registration details shown below, coming soon...",
+        "endOfEvent": "Waiting for the event to be finalized",
+        "eventCardButtons": {
+            "loading": "Loading...",
+            "viewDetails": "View Event Details",
+            "register": "Register for this event",
+            "waitingForApproval": "Waiting for approval"
+        },
+        "adminActions": {
+            "event": {
+                "title": "Event",
+                "edit": "Edit",
+                "copy": "Copy",
+                "setPrice": "Set Price",
+                "visibility": {
+                    "title": "Visibility",
+                    "public": "Public",
+                    "adminOnly": "Admin Only"
+                }
+            },
+            "team": {
+                "title": "Team",
+                "addGuest": "Add Guest",
+                "viewGuests": "View Guests"
+            },
+            "dangerZone": {
+                "title": "Danger Zone",
+                "reset": "Reset"
+            },
+            "modal": {
+                "editModal": {
+                    "mainTitle": "Edit Event",
+                    "title": "Title",
+                    "description": "Description",
+                    "price": "Price",
+                    "maxAttendees": "Max Attendees",
+                    "startDateAndTime": {
+                        "title": "Start Date & Time",
+                        "startDate": "Date",
+                        "time": "Time"
+                    },
+                    "endDateAndTime": {
+                        "title": "End Date & Time",
+                        "endDate": "Date",
+                        "time": "Time"
+                    },
+                    "location": "Location",
+                    "recurringEvent": {
+                        "title": "Recurring Event",
+                        "description": "Enable if this event repeats on a schedule",
+                        "frequency": {
+                            "title": "Frequency",
+                            "description": "Frequency of the event"
+                        },
+                        "frequencyOptions": {
+                            "daily": "Daily",
+                            "weekly": "Weekly",
+                            "monthly": "Monthly"
+                        }
+                    },
+                    "eventActive": {
+                        "title": "Event Active",
+                        "description": "Inactive events won't appear in the public event list"
+                    }
+                }
+            }
+        },
+        "registrationDetails": {
+            "subtitle": "Event Registration Details",
+            "date": "Date",
+            "time": "Time",
+            "location": "Location",
+            "registrationsListTitle": "Event Registrations",
+            "joinButton": {
+                "joinThisEvent": "Join this event",
+                "isJoining": "Joining..."
+            },
+            "registeredAttendees": "Registered Attendees",
+            "waitlistUsers": "Waitlist Users"
+        },
+        "AccountPage": {
+            "title": "Account Dashboard",
+            "subtitle": "Manage your account and view transaction history",
+            "cards": {
+                "currentBalance": "Current Balance",
+                "totalTransactions": "Total Transactions",
+                "recentTransactions": "Recent Transactions",
+                "lastTransaction": "Last Transaction"
+            },
+            "tabs": {
+                "transactions": "Recent Transactions",
+                "healthReports": "Calorie Consumption"
+            },
+            "transactionHistory": {
+                "title": "Transaction History",
+                "subtitle": "Your recent credit transactions and activity",
+                "noTransactions": "No transactions found",
+                "loading": "Loading transactions...",
+                "error": "Failed to load transactions",
+                "retry": "Retry",
+                "Amount": "Amount",
+                "Balance": "Balance"
+            }
+        }
+    }
+}

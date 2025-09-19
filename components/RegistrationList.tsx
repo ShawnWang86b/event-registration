@@ -6,6 +6,7 @@ import {
   UserStatus,
 } from "@/components/registration";
 import { useRegistrationList } from "@/hooks";
+import { useTranslations } from "next-intl";
 
 type RegistrationListProps = {
   eventId: number;
@@ -16,6 +17,7 @@ const RegistrationList = ({
   eventId,
   isInline = false,
 }: RegistrationListProps) => {
+  const t = useTranslations("EventsPage.registrationDetails");
   const {
     data,
     registeredUsers,
@@ -57,7 +59,7 @@ const RegistrationList = ({
         className={
           isInline
             ? ""
-            : "bg-white rounded-lg shadow-md p-6 max-w-4xl w-full mx-auto"
+            : "bg-background rounded-lg shadow-md p-6 max-w-4xl w-full mx-auto"
         }
       >
         <ErrorState
@@ -73,7 +75,7 @@ const RegistrationList = ({
       className={
         isInline
           ? ""
-          : "bg-white rounded-lg shadow-md p-6 max-w-4xl w-full mx-auto"
+          : "bg-background rounded-lg shadow-md p-6 max-w-4xl w-full mx-auto"
       }
     >
       {/* Header - only show for standalone view */}

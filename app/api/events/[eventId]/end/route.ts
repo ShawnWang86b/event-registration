@@ -230,19 +230,6 @@ export async function POST(request: Request, context: any) {
       return userPriceInfo && !userPriceInfo.useDefault;
     }).length;
 
-    // Log the action
-    console.log(
-      `Admin ${currentUserId} ended event ${eventIdNum}. Processed ${
-        deductionResults.length
-      } deductions (${customPriceCount} with custom prices). Total deducted: $${totalDeducted.toFixed(
-        2
-      )}. ${
-        negativeBalanceWarnings.length
-      } users have negative balances. Created ${
-        deductionResults.length
-      } transaction records.`
-    );
-
     return NextResponse.json({
       success: true,
       event: {

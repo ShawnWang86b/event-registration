@@ -55,14 +55,12 @@ const EventCalendar = ({
 
   // Handle event selection
   const handleSelectEvent = (event: any) => {
-    console.log("Selected event:", event);
     // You can add navigation or modal opening logic here
   };
 
   // Handle empty slot selection for creating new events
   const handleSelectSlot = (slotInfo: any) => {
     if (isAdmin) {
-      console.log("Selected slot:", slotInfo);
       // You could open create event modal with pre-filled dates
       onCreateClick();
     }
@@ -177,7 +175,6 @@ const EventCalendar = ({
   };
 
   const handleEventRegister = (eventId: number) => {
-    console.log("Register for event:", eventId);
     // TODO: Handle registration logic
   };
 
@@ -230,7 +227,7 @@ const EventCalendar = ({
             <EventCard
               event={selectedEvent}
               onRegister={handleEventRegister}
-              isExpanded={true}
+              isExpanded={false}
               onClose={handleEventCardClose}
             />
           </div>

@@ -87,8 +87,6 @@ export const useDeleteGuestRegistration = (eventId?: number) => {
       queryClient.invalidateQueries({
         queryKey: ["events"],
       });
-
-      console.log("Cache refreshed after guest deletion");
     },
     onError: (error) => {
       console.error("Failed to delete guest registration:", error);

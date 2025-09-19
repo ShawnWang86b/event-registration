@@ -72,7 +72,6 @@ export const useEventDisplay = () => {
 
   const handleEventRegister = useCallback((eventId: number) => {
     // This can be extended to handle registration logic
-    console.log("Registering for event:", eventId);
   }, []);
 
   // Admin-specific empty state action

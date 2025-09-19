@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { UserCard } from "./UserCard";
 
 type Registration = {
@@ -26,9 +27,12 @@ export const RegisteredUsers = ({
   isCanceling,
   isDeletingGuest = false,
 }: RegisteredUsersProps) => {
+  const t = useTranslations("EventsPage.registrationDetails");
   return (
     <div className="mb-6">
-      <h3 className="text-sm mb-3">Registered Attendees ({users.length})</h3>
+      <h3 className="text-sm mb-3">
+        {t("registeredAttendees")} ({users.length})
+      </h3>
       {users.length > 0 ? (
         <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
           {users.map((registration, index) => (

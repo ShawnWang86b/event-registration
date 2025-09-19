@@ -66,13 +66,6 @@ export async function PATCH(request: Request, context: any) {
       .where(eq(eventsTable.id, eventIdNum))
       .returning();
 
-    // Log the action
-    console.log(
-      `Admin ${currentUserId} ${
-        isActive ? "activated" : "deactivated"
-      } event ${eventIdNum}: ${updatedEvent.title}`
-    );
-
     return NextResponse.json({
       success: true,
       event: updatedEvent,

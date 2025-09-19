@@ -15,6 +15,7 @@ import {
   formatDisplayTime,
 } from "@/utils/dateTime";
 import { EVENT_FORM_CONSTANTS } from "@/constants/eventForm";
+import { useTranslations } from "next-intl";
 
 type DateTimePickerProps = {
   label: string;
@@ -36,6 +37,7 @@ export const DateTimePicker = ({
   timeId = "time-picker",
 }: DateTimePickerProps) => {
   const [isDateOpen, setIsDateOpen] = useState(false);
+  const t = useTranslations("EventsPage.adminActions.modal.editModal");
 
   const currentDate = value ? new Date(value) : undefined;
   const currentTime = value ? formatDisplayTime(value) : defaultTime;
@@ -59,7 +61,7 @@ export const DateTimePicker = ({
       <div className="flex gap-4">
         <div className="flex flex-col gap-3">
           <Label htmlFor={dateId} className="px-1">
-            {EVENT_FORM_CONSTANTS.LABELS.DATE}
+            {t("startDateAndTime.startDate")}
           </Label>
           <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
             <PopoverTrigger asChild>
@@ -90,7 +92,7 @@ export const DateTimePicker = ({
 
         <div className="flex flex-col gap-3">
           <Label htmlFor={timeId} className="px-1">
-            {EVENT_FORM_CONSTANTS.LABELS.TIME}
+            {t("startDateAndTime.time")}
           </Label>
           <Input
             type="time"

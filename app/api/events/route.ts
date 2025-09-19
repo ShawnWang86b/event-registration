@@ -100,11 +100,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const { userId, sessionId } = await auth();
-    console.log("Auth details:", {
-      userId,
-      sessionId,
-      headers: Object.fromEntries(req.headers.entries()),
-    });
 
     if (!userId) {
       console.error("No user ID found in request");
@@ -116,15 +111,12 @@ export async function POST(req: Request) {
       where: eq(usersTable.id, userId),
     });
 
-    console.log("Found user in database:", user);
-
     if (!user) {
       console.error(`User not found in database: ${userId}`);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     if (user.role !== "admin") {
-      console.error(`User ${userId} is not an admin`);
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
         { status: 403 }
@@ -132,7 +124,6 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    console.log("Received request body:", body);
 
     const {
       title,
@@ -223,7 +214,6 @@ export async function POST(req: Request) {
       })
       .returning();
 
-    console.log("Successfully created event:", newEvent[0]);
     return NextResponse.json(newEvent[0], { status: 201 });
   } catch (error) {
     console.error("Error creating event:", error);

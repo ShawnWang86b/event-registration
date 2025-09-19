@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Activity, Calendar, TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type AccountSummaryProps = {
   summary: {
@@ -17,33 +18,34 @@ export const AccountSummary = ({
   summary,
   formatCurrency,
 }: AccountSummaryProps) => {
+  const t = useTranslations("AccountPage.cards");
   const summaryCards = [
     {
-      title: "Current Balance",
+      title: t("currentBalance"),
       value: formatCurrency(summary.currentBalance),
       icon: DollarSign,
       color: "text-foreground",
       bgColor: "bg-card",
     },
     {
-      title: "Total Transactions",
+      title: t("totalTransactions"),
       value: summary.totalTransactions.toString(),
       icon: Activity,
       color: "text-foreground",
       bgColor: "bg-card",
     },
     {
-      title: "Recent Transactions",
+      title: t("recentTransactions"),
       value: `${summary.recentActivity} this month`,
       icon: TrendingUp,
       color: "text-foreground",
       bgColor: "bg-card",
     },
     {
-      title: "Last Transaction",
+      title: t("lastTransaction"),
       value: summary.lastTransaction
         ? summary.lastTransaction.toLocaleDateString()
-        : "No transactions",
+        : t("noTransactions"),
       icon: Calendar,
       color: "text-foreground",
       bgColor: "bg-card",

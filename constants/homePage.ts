@@ -10,23 +10,21 @@ export const galleryImages: GalleryImage[] = [
   { src: "/team/image-6.jpg", alt: "Basketball practice" },
 ];
 
+// here to use the translation key
 export const features: Feature[] = [
   {
     icon: Calendar,
-    title: "Regular Events",
-    description:
-      "Weekly games, tournaments, and training sessions for all skill levels.",
+    title: "regularEvents",
+    description: "regularEvents",
   },
   {
     icon: Users,
-    title: "Community",
-    description:
-      "Connect with passionate players and build lasting friendships on and off the court.",
+    title: "community",
+    description: "community",
   },
   {
     icon: Trophy,
-    title: "Competition",
-    description:
-      "Participate in organized leagues and tournaments to test your skills.",
+    title: "competition",
+    description: "competition",
   },
 ];

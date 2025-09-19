@@ -6,8 +6,11 @@ import { LoadingState, ErrorState } from "@/components/states";
 import { AccountSummary, TransactionList } from "@/components/account";
 import { useAccount } from "@/hooks";
 import { withErrorBoundary } from "@/components/ErrorBoundary";
+import { useTranslations } from "next-intl";
 
 const AccountPage = () => {
+  const t = useTranslations("AccountPage");
+
   const {
     transactions,
     accountSummary,
@@ -37,16 +40,13 @@ const AccountPage = () => {
     <div className="min-h-screen min-w-[80vw] lg:w-auto p-0 pt-10 lg:p-16">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-lg lg:text-3xl font-bold text-secondary-foreground">
-          Account Dashboard
+        <h1 className="text-lg lg:text-3xl font-bold text-foreground">
+          {t("title")}
         </h1>
-        <p className="text-primary text-sm lg:text-lg mt-2">
-          Manage your account and view transaction history
-        </p>
+        <p className="text-primary text-sm lg:text-lg mt-2">{t("subtitle")}</p>
       </div>
 
       {/* Account Summary */}
-
       {accountSummary && (
         <AccountSummary
           summary={accountSummary}
@@ -58,8 +58,10 @@ const AccountPage = () => {
       <div className="w-full pr-4 lg:pr-0">
         <Tabs defaultValue="transactions" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
-            <TabsTrigger value="reports">Calorie Consumption</TabsTrigger>
+            <TabsTrigger value="transactions">
+              {t("tabs.transactions")}
+            </TabsTrigger>
+            <TabsTrigger value="reports">{t("tabs.healthReports")}</TabsTrigger>
           </TabsList>
 
           {/* Transactions Tab */}

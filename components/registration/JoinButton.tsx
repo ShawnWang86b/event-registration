@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 type JoinButtonProps = {
   onJoin: () => void;
   isJoining: boolean;
@@ -11,12 +13,13 @@ export const JoinButton = ({
   userId,
   isUserRegistered,
 }: JoinButtonProps) => {
+  const t = useTranslations("EventsPage.registrationDetails.joinButton");
   if (isUserRegistered) return null;
 
   const getButtonText = () => {
     if (!userId) return "Sign in to join";
-    if (isJoining) return "Joining...";
-    return "Join This Event";
+    if (isJoining) return t("isJoining");
+    return t("joinThisEvent");
   };
 
   return (

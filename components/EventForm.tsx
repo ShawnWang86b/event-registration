@@ -25,6 +25,7 @@ import { Event } from "@/types";
 import { useEventForm } from "@/hooks/use-event-form";
 import { EVENT_FORM_CONSTANTS } from "@/constants/eventForm";
 import { DateTimePicker } from "@/components/form/DateTimePicker";
+import { useTranslations } from "next-intl";
 
 type EventFormProps = {
   event?: Event;
@@ -47,6 +48,7 @@ export default function EventForm({
       onSubmit,
     }
   );
+  const t = useTranslations("EventsPage.adminActions.modal.editModal");
 
   return (
     <div className="space-y-6">
@@ -58,7 +60,7 @@ export default function EventForm({
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Event Title *</FormLabel>
+                <FormLabel>{t("title")} *</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -73,7 +75,7 @@ export default function EventForm({
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description *</FormLabel>
+                <FormLabel>{t("description")} *</FormLabel>
                 <FormControl>
                   <Textarea rows={4} {...field} />
                 </FormControl>
@@ -89,7 +91,7 @@ export default function EventForm({
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price ($) *</FormLabel>
+                  <FormLabel>{t("price")} ($) *</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -114,7 +116,7 @@ export default function EventForm({
               name="maxAttendees"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Max Attendees *</FormLabel>
+                  <FormLabel>{t("maxAttendees")} *</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -140,7 +142,7 @@ export default function EventForm({
             name="startDate"
             render={({ field }) => (
               <DateTimePicker
-                label="Start Date & Time *"
+                label={t("startDateAndTime.title")}
                 value={field.value}
                 onChange={field.onChange}
                 defaultTime="10:00"
@@ -157,7 +159,7 @@ export default function EventForm({
             name="endDate"
             render={({ field }) => (
               <DateTimePicker
-                label="End Date & Time *"
+                label={t("endDateAndTime.title")}
                 value={field.value}
                 onChange={field.onChange}
                 defaultTime="12:00"
@@ -174,7 +176,7 @@ export default function EventForm({
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location *</FormLabel>
+                <FormLabel>{t("location")} *</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -193,9 +195,11 @@ export default function EventForm({
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border-input border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base">Recurring Event</FormLabel>
+                  <FormLabel className="text-base">
+                    {t("recurringEvent.title")}
+                  </FormLabel>
                   <FormDescription>
-                    Enable if this event repeats on a schedule
+                    {t("recurringEvent.description")}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -218,7 +222,7 @@ export default function EventForm({
               name="frequency"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Frequency *</FormLabel>
+                  <FormLabel>{t("recurringEvent.frequency.title")} *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -229,9 +233,15 @@ export default function EventForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="daily">
+                        {t("recurringEvent.frequencyOptions.daily")}
+                      </SelectItem>
+                      <SelectItem value="weekly">
+                        {t("recurringEvent.frequencyOptions.weekly")}
+                      </SelectItem>
+                      <SelectItem value="monthly">
+                        {t("recurringEvent.frequencyOptions.monthly")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -248,9 +258,11 @@ export default function EventForm({
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">Event Active</FormLabel>
+                    <FormLabel className="text-base">
+                      {t("eventActive.title")}
+                    </FormLabel>
                     <FormDescription>
-                      Inactive events won&apos;t appear in the public event list
+                      {t("eventActive.description")}
                     </FormDescription>
                   </div>
                   <FormControl>

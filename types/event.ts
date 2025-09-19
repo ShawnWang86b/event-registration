@@ -29,6 +29,10 @@ export type CreateEventData = {
   maxAttendees: number;
 };
 
+export type CopyEventData = {
+  eventId: number;
+};
+
 export type UpdateEventData = Partial<CreateEventData> & {
   id: number;
   isActive?: boolean;

@@ -3,6 +3,7 @@ import { apiClient, handleApiError } from "./api-client";
 import {
   Event,
   CreateEventData,
+  CopyEventData,
   UpdateEventData,
   Registration,
   CreateRegistrationData,
@@ -56,6 +57,16 @@ export const eventsApi = {
     try {
       const response = await apiClient.post("/events", data);
       return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Copy event (admin only)
+  copyEvent: async (data: CopyEventData): Promise<Event> => {
+    try {
+      const response = await apiClient.post(`/events/${data.eventId}/copy`);
+      return response.data.copiedEvent;
     } catch (error) {
       throw handleApiError(error as AxiosError);
     }

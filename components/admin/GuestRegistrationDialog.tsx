@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRegisterGuest } from "@/hooks/use-admin-guest-registration";
 import { Event } from "@/types";
-import LoadingSpinner from "@/components/LoadingSpinner";
 
 type GuestRegistrationDialogProps = {
   event: Event;
@@ -120,12 +119,7 @@ export const GuestRegistrationDialog = ({
                 disabled={registerGuestMutation.isPending || !guestName.trim()}
               >
                 {registerGuestMutation.isPending ? (
-                  <>
-                    <div className="w-4 h-4 mr-2">
-                      <LoadingSpinner />
-                    </div>
-                    Registering...
-                  </>
+                  <>Registering...</>
                 ) : (
                   "Register Guest"
                 )}

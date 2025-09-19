@@ -1,6 +1,6 @@
 import { MoveRight } from "lucide-react";
-import { EVENT_CARD_CONSTANTS } from "@/constants/eventCard";
 import type { ButtonState } from "@/constants/eventCard";
+import { useTranslations } from "next-intl";
 
 type EventCardRegisterButtonProps = {
   buttonState: ButtonState;
@@ -13,15 +13,17 @@ export const EventCardRegisterButton = ({
   onClick,
   disabled = false,
 }: EventCardRegisterButtonProps) => {
+  const t = useTranslations("EventsPage.eventCardButtons");
+
   const getButtonText = (): string => {
     switch (buttonState) {
       case "loading":
-        return EVENT_CARD_CONSTANTS.BUTTONS.LOADING;
+        return t("loading");
       case "view_details":
-        return EVENT_CARD_CONSTANTS.BUTTONS.VIEW_DETAILS;
+        return t("viewDetails");
       case "register":
       default:
-        return EVENT_CARD_CONSTANTS.BUTTONS.REGISTER;
+        return t("register");
     }
   };
 
@@ -33,7 +35,7 @@ export const EventCardRegisterButton = ({
       <button
         onClick={onClick}
         disabled={isDisabled}
-        className="text-lg w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-gray-100 disabled:cursor-not-allowed text-popover font-medium py-2 px-4 rounded-md border hover:cursor-pointer transition-colors"
+        className="text-lg w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-gray-100 disabled:cursor-not-allowed text-primary-foreground font-medium py-2 px-4 rounded-md border hover:cursor-pointer transition-colors"
       >
         <span>{getButtonText()}</span>
         <MoveRight className="w-4 h-4" />

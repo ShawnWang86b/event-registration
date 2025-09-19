@@ -24,9 +24,8 @@ import {
 } from "@/components/event-card";
 import { withErrorBoundary } from "@/components/ErrorBoundary";
 import ResetEventDialog from "./ResetEvent";
-import { useCallback, useMemo } from "react";
-import { MoveRight } from "lucide-react";
-import { Button } from "./ui/button";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 type EventCardProps = {
   event: Event;
@@ -59,6 +58,9 @@ const EventCard = ({
     getLocationImage,
     formatPrice,
   } = useEventCard({ event, onRegister });
+
+  const t = useTranslations("EventsPage.registrationDetails");
+  const tEventCardButtons = useTranslations("EventsPage.eventCardButtons");
 
   const isPublicVisible = useMemo(
     () => event.isPublicVisible,
@@ -113,8 +115,8 @@ const EventCard = ({
             />
           ) : (
             <div className="mt-4 pt-4">
-              <div className="h-12 text-lg text-foreground w-full flex items-center justify-center gap-2 bg-secondary font-medium py-2 px-4 rounded-md hover:cursor-not-allowed transition-colors">
-                {EVENT_CARD_CONSTANTS.STATUS.END_OF_EVENT}
+              <div className="h-12 text-lg text-secondary-foreground w-full flex items-center justify-center gap-2 bg-secondary font-medium py-2 px-4 rounded-md hover:cursor-not-allowed transition-colors">
+                {tEventCardButtons("waitingForApproval")}
               </div>
             </div>
           )}
@@ -139,7 +141,7 @@ const EventCard = ({
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
             <DialogDescription className="text-card-foreground">
-              {EVENT_CARD_CONSTANTS.LABELS.REGISTRATION_DETAILS}
+              {t("subtitle")}
             </DialogDescription>
           </DialogHeader>
 
@@ -147,7 +149,7 @@ const EventCard = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-card p-3 rounded border">
                 <h3 className="font-semibold text-card-foreground text-sm mb-1">
-                  {EVENT_CARD_CONSTANTS.LABELS.DATE}
+                  {t("date")}
                 </h3>
                 <p className="text-primary text-sm font-medium">
                   {formatDisplayDateLong(event.startDate)}
@@ -155,7 +157,7 @@ const EventCard = ({
               </div>
               <div className="bg-card p-3 rounded border">
                 <h3 className="font-semibold text-card-foreground text-sm mb-1">
-                  {EVENT_CARD_CONSTANTS.LABELS.TIME}
+                  {t("time")}
                 </h3>
                 <p className="text-primary text-sm font-medium">
                   {formatDisplayTimeRange(event.startDate, event.endDate)}
@@ -166,7 +168,7 @@ const EventCard = ({
             {event.location && (
               <div className="bg-card p-3 rounded border">
                 <h3 className="font-semibold text-card-foreground text-sm mb-1">
-                  {EVENT_CARD_CONSTANTS.LABELS.LOCATION}
+                  {t("location")}
                 </h3>
                 <p className="text-primary text-sm">{event.location}</p>
               </div>
@@ -175,7 +177,7 @@ const EventCard = ({
             {/* Registration List */}
             <div className="border rounded-md p-3">
               <h3 className="text-sm font-medium text-foreground mb-3">
-                {EVENT_CARD_CONSTANTS.LABELS.EVENT_REGISTRATIONS}
+                {t("registrationsListTitle")}
               </h3>
               <RegistrationList eventId={event.id} isInline={true} />
             </div>
@@ -210,9 +212,11 @@ const EventCard = ({
 // Export wrapped component with error boundary
 const EventCardWithErrorBoundary = withErrorBoundary(
   EventCard,
-  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-    <h3 className="text-red-800 font-semibold mb-2">Failed to load event</h3>
-    <p className="text-red-600 text-sm">
+  <div className="bg-red-50 border border-destructive rounded-lg p-4">
+    <h3 className="text-destructive font-semibold mb-2">
+      Failed to load event
+    </h3>
+    <p className="text-destructive text-sm">
       There was an error displaying this event. Please try refreshing the page.
     </p>
   </div>

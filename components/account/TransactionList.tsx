@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { LoadingState, ErrorState, EmptyState } from "@/components/states";
 import { CreditTransaction } from "@/types";
+import { useTranslations } from "next-intl";
 
 type TransactionListProps = {
   transactions: CreditTransaction[];
@@ -32,6 +33,7 @@ export const TransactionList = ({
   formatTransactionAmount,
   onRetry,
 }: TransactionListProps) => {
+  const t = useTranslations("AccountPage.transactionHistory");
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -46,24 +48,20 @@ export const TransactionList = ({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-foreground text-lg">
-          Transaction History
+          {t("title")}
         </CardTitle>
         <CardDescription className="text-primary text-md">
-          Your recent credit transactions and activity
+          {t("subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading && (
-          <LoadingState
-            message="Loading transactions..."
-            size="md"
-            fullHeight={false}
-          />
+          <LoadingState message={t("loading")} size="md" fullHeight={false} />
         )}
 
         {hasError && (
           <ErrorState
-            message="Failed to load transactions"
+            message={t("error")}
             onRetry={onRetry}
             fullHeight={false}
           />
@@ -71,7 +69,7 @@ export const TransactionList = ({
 
         {!isLoading && !hasError && !hasTransactions && (
           <EmptyState
-            title="No transactions found"
+            title={t("noTransactions")}
             message="You haven't made any transactions yet. Your transaction history will appear here once you start using the platform."
             fullHeight={false}
           />
@@ -104,7 +102,7 @@ export const TransactionList = ({
 
                   <div className="text-left lg:text-right py-2 lg:py-0">
                     <div className="text-md text-foreground pr-2">
-                      Amount:{" "}
+                      {t("Amount")}:{" "}
                       <span
                         className={`font-semibold tracking-wide ${amountInfo.color}`}
                       >
@@ -112,7 +110,7 @@ export const TransactionList = ({
                       </span>
                     </div>
                     <div className="text-md text-foreground pr-2 tracking-wide">
-                      Balance:{" "}
+                      {t("Balance")}:{" "}
                       {formatCurrency(parseFloat(transaction.balanceAfter))}
                     </div>
                   </div>

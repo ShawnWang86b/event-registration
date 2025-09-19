@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useEditEvent } from "@/hooks";
+import { useTranslations } from "next-intl";
 
 type EditEventDialogProps = {
   event: Event;
@@ -23,12 +24,13 @@ export default function EditEventDialog({
   onClose,
 }: EditEventDialogProps) {
   const { handleSubmit, isLoading } = useEditEvent(event, onClose);
+  const t = useTranslations("EventsPage.adminActions.modal.editModal");
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-4! bg-card sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Event</DialogTitle>
+          <DialogTitle>{t("mainTitle")}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
