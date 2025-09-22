@@ -22,13 +22,13 @@ export const BalanceForm = ({
     <form onSubmit={onSubmit} className="space-y-6">
       {/* Amount Input */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-900">
+        <label className="text-sm font-medium text-foreground">
           Amount to Add (will be added to each selected user)
         </label>
         <input
           type="number"
-          min="1"
-          step="1"
+          min="0.01"
+          step="0.01"
           {...form.register("amount", { valueAsNumber: true })}
           placeholder="Enter amount..."
           className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"

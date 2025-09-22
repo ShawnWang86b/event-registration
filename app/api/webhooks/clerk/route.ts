@@ -63,7 +63,7 @@ export async function POST(req: Request) {
           id: id!,
           ...userData,
           role: "user",
-          creditBalance: 0,
+          creditBalance: "0",
           createdAt: new Date(),
         });
       } else {

@@ -219,7 +219,7 @@ export async function POST(request: Request) {
         throw new Error("User not found");
       }
 
-      const currentBalance = user[0].creditBalance;
+      const currentBalance = parseFloat(user[0].creditBalance);
       let newBalance: number;
       let transactionAmount: number;
 
@@ -260,7 +260,7 @@ export async function POST(request: Request) {
       await tx
         .update(usersTable)
         .set({
-          creditBalance: newBalance,
+          creditBalance: newBalance.toString(),
           updatedAt: new Date(),
         })
         .where(eq(usersTable.id, userId));

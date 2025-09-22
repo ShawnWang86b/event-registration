@@ -64,7 +64,7 @@ export async function POST(request: Request) {
           name: guestName,
           email: guestEmail,
           role: "guest", // Set role as 'guest'
-          creditBalance: 0, // Guests don't have credits
+          creditBalance: "0", // Guests don't have credits
         })
         .returning();
 

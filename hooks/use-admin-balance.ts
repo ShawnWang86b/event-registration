@@ -10,7 +10,7 @@ import { UserSearchResult } from "@/types";
 // Form schema
 const balanceAdjustmentSchema = z.object({
   userIds: z.array(z.string()).min(1, "Please select at least one user"),
-  amount: z.number().min(1, "Amount must be greater than 0"),
+  amount: z.number().min(0.01, "Amount must be greater than 0"),
 });
 
 type BalanceAdjustmentForm = z.infer<typeof balanceAdjustmentSchema>;

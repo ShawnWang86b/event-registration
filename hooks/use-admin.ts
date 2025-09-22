@@ -77,6 +77,11 @@ export const useAdjustUserBalance = () => {
         queryKey: adminKeys.users(),
       });
 
+      // Invalidate the admin users grid queries (different query key structure)
+      queryClient.invalidateQueries({
+        queryKey: ["admin-users"],
+      });
+
       // Update the cache with the new balance
       queryClient.setQueryData(adminKeys.userBalance(variables.userId), {
         ...response.user,

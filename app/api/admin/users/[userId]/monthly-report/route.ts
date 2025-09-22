@@ -271,7 +271,7 @@ export async function GET(request: Request, context: any) {
         id: targetUser[0].id,
         name: targetUser[0].name,
         email: targetUser[0].email,
-        currentBalance: targetUser[0].creditBalance,
+        currentBalance: parseFloat(targetUser[0].creditBalance),
       },
       reportPeriod: {
         year,

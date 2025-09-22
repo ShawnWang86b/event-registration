@@ -9,6 +9,7 @@ import {
   pgEnum,
   serial,
   primaryKey,
+  real,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -34,7 +35,10 @@ export const usersTable = pgTable("users", {
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
   role: roleEnum("role").notNull().default("user"),
-  creditBalance: integer().notNull().default(0),
+  creditBalance: decimal("credit_balance", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

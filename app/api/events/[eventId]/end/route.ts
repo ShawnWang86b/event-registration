@@ -162,7 +162,7 @@ export async function POST(request: Request, context: any) {
           priceToCharge = defaultPrice;
         }
 
-        const currentBalance = registration.user.creditBalance;
+        const currentBalance = parseFloat(registration.user.creditBalance);
         const newBalance = currentBalance - priceToCharge;
         const wentNegative = newBalance < 0;
 
@@ -171,7 +171,7 @@ export async function POST(request: Request, context: any) {
         await tx
           .update(usersTable)
           .set({
-            creditBalance: newBalance,
+            creditBalance: newBalance.toString(),
             updatedAt: new Date(),
           })
           .where(eq(usersTable.id, registration.userId));

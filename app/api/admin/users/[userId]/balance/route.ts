@@ -67,7 +67,7 @@ export async function PUT(request: Request, context: any) {
     }
 
     // Calculate new balance
-    const currentBalance = targetUser[0].creditBalance;
+    const currentBalance = parseFloat(targetUser[0].creditBalance);
     let newBalance: number;
     let transactionAmount: number;
     let transactionType: "admin_adjust" = "admin_adjust";
@@ -96,7 +96,7 @@ export async function PUT(request: Request, context: any) {
       const [updatedUser] = await tx
         .update(usersTable)
         .set({
-          creditBalance: newBalance,
+          creditBalance: newBalance.toString(),
           updatedAt: new Date(),
         })
         .where(eq(usersTable.id, userId))
