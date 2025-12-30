@@ -7,7 +7,7 @@ import { eq, and } from "drizzle-orm";
 // GET specific organizer request (admin only)
 export async function GET(
   req: Request,
-  { params }: { params: { requestId: string } }
+  { params }: { params: Promise<{ requestId: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -28,7 +28,7 @@ export async function GET(
       );
     }
 
-    const requestId = params.requestId;
+    const { requestId } = await params;
     if (!requestId) {
       return NextResponse.json(
         { error: "Invalid request ID" },
@@ -61,7 +61,7 @@ export async function GET(
 // PUT update organizer request status (admin only)
 export async function PUT(
   req: Request,
-  { params }: { params: { requestId: string } }
+  { params }: { params: Promise<{ requestId: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -82,7 +82,7 @@ export async function PUT(
       );
     }
 
-    const requestId = params.requestId;
+    const { requestId } = await params;
     if (!requestId) {
       return NextResponse.json(
         { error: "Invalid request ID" },
@@ -155,7 +155,7 @@ export async function PUT(
 // DELETE organizer request (admin only)
 export async function DELETE(
   req: Request,
-  { params }: { params: { requestId: string } }
+  { params }: { params: Promise<{ requestId: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -176,7 +176,7 @@ export async function DELETE(
       );
     }
 
-    const requestId = params.requestId;
+    const { requestId } = await params;
     if (!requestId) {
       return NextResponse.json(
         { error: "Invalid request ID" },
