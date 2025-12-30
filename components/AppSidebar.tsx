@@ -1,6 +1,17 @@
 "use client";
 
-import { Calendar, Home, Shield, ShoppingBag, User } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Shield,
+  ShoppingBag,
+  User,
+  Puzzle,
+  DollarSign,
+  Users,
+  FileText,
+  ChevronRight,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,6 +23,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +39,12 @@ import {
 } from "@/components/ui/shadcn-io/theme-toggle-button";
 import LanguageSelect from "./LanguageSelect";
 import { useTranslations } from "next-intl";
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export function AppSidebar() {
   // Get current user from database
@@ -61,16 +81,35 @@ export function AppSidebar() {
       url: "/shop",
       icon: ShoppingBag,
     },
-  ];
-
-  // Admin-only menu items
-  const adminItems = [
     {
-      title: t("admin"),
-      url: "/admin",
-      icon: Shield,
+      title: t("becomeOrganizer"),
+      url: "/become-organizer",
+      icon: Puzzle,
     },
   ];
+
+  // Admin-only menu items with sub-items
+  const adminParentItem = {
+    title: t("admin"),
+    icon: Shield,
+    subItems: [
+      {
+        title: "Manage Credits", // You'll want to add this to translations
+        url: "/admin",
+        icon: DollarSign,
+      },
+      {
+        title: "View Users", // You'll want to add this to translations
+        url: "/admin/users",
+        icon: Users,
+      },
+      {
+        title: "Organizer Requests", // You'll want to add this to translations
+        url: "/admin/organizer-requests",
+        icon: FileText,
+      },
+    ],
+  };
   // Get sidebar state and controls
   const { setOpenMobile, isMobile } = useSidebar();
 
@@ -81,10 +120,15 @@ export function AppSidebar() {
   const { theme, setTheme, systemTheme } = useTheme();
   const { startTransition } = useThemeTransition();
   const [mounted, setMounted] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Auto-open admin menu if on admin route
+    if (pathname.startsWith("/admin")) {
+      setIsAdminMenuOpen(true);
+    }
+  }, [pathname]);
 
   const handleThemeToggle = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -105,7 +149,7 @@ export function AppSidebar() {
   const isAdmin = !isUserLoading && currentUser?.role === "admin";
 
   // Combine menu items based on user role
-  const menuItems = isAdmin ? [...baseItems, ...adminItems] : baseItems;
+  const menuItems = isAdmin ? baseItems : baseItems;
 
   // Handle navigation click - close mobile sidebar
   const handleNavClick = () => {
@@ -147,9 +191,57 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+              {/* Admin menu item with collapsible sub-items */}
+              {isAdmin && (
+                <Collapsible
+                  asChild
+                  open={isAdminMenuOpen}
+                  onOpenChange={setIsAdminMenuOpen}
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton
+                        isActive={pathname.startsWith("/admin")}
+                        className={`${
+                          pathname.startsWith("/admin")
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                            : ""
+                        }`}
+                      >
+                        <adminParentItem.icon />
+                        <span>{adminParentItem.title}</span>
+                        <ChevronRight
+                          className={`ml-auto transition-transform duration-200 ${
+                            isAdminMenuOpen ? "rotate-90" : ""
+                          }`}
+                        />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {adminParentItem.subItems.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={isActiveRoute(subItem.url)}
+                            >
+                              <Link href={subItem.url} onClick={handleNavClick}>
+                                <subItem.icon />
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
         <div className="flex flex-col gap-4 mb-20 pb-10 ">
           {isUserLoading ? (
             // Loading skeleton for user section

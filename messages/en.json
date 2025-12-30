@@ -5,6 +5,7 @@
         "events": "Events",
         "account": "Account",
         "shop": "Shop",
+        "becomeOrganizer": "Become an Organizer",
         "admin": "Admin"
     },
     "HomePage": {

@@ -13,3 +13,35 @@ export type PaginatedResponse<T> = {
     totalPages: number;
   };
 };
+
+// Organizer Request types
+export type OrganizerRequestStatus = "pending" | "approved" | "rejected";
+export type EventType =
+  | "basketball"
+  | "badminton"
+  | "volleyball"
+  | "tennis"
+  | "table tennis"
+  | "other";
+
+export type OrganizerRequest = {
+  id: string;
+  userId: string;
+  eventType: EventType;
+  description: string;
+  contactInfo: string | null;
+  status: OrganizerRequestStatus;
+  reviewedBy: string | null;
+  reviewedAt: Date | null;
+  reviewNotes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type CreateOrganizerRequestData = {
+  eventType: EventType;
+  description: string;
+  contactInfo?: string;
+};
+
+export type OrganizerRequestResponse = OrganizerRequest;

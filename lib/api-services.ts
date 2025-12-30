@@ -28,6 +28,9 @@ import {
   CreateGuestRegistrationData,
   GuestRegistrationResponse,
   GuestRegistrationsListResponse,
+  CreateOrganizerRequestData,
+  OrganizerRequestResponse,
+  AdminOrganizerRequestsResponse,
 } from "@/types";
 
 // Events API
@@ -397,6 +400,17 @@ export const adminApi = {
       throw handleApiError(error as AxiosError);
     }
   },
+
+  //Admin can get all organizer requests
+  getAllOrganizerRequests:
+    async (): Promise<AdminOrganizerRequestsResponse> => {
+      try {
+        const response = await apiClient.get("/admin/organizer-requests");
+        return response.data;
+      } catch (error) {
+        throw handleApiError(error as AxiosError);
+      }
+    },
 };
 
 // Auth API
@@ -429,6 +443,31 @@ export const authApi = {
   },
 };
 
+// Organizer Requests API
+export const organizerRequestsApi = {
+  // Create new organizer request
+  createOrganizerRequest: async (
+    data: CreateOrganizerRequestData
+  ): Promise<OrganizerRequestResponse> => {
+    try {
+      const response = await apiClient.post("/organizer-requests", data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+
+  // Get user's own organizer requests
+  getMyOrganizerRequests: async (): Promise<OrganizerRequestResponse[]> => {
+    try {
+      const response = await apiClient.get("/organizer-requests/my-request");
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error as AxiosError);
+    }
+  },
+};
+
 // Combined API object
 export const api = {
   auth: authApi,
@@ -436,4 +475,5 @@ export const api = {
   registrations: registrationsApi,
   transactions: transactionsApi,
   admin: adminApi,
+  organizerRequests: organizerRequestsApi,
 };

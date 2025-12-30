@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { eventsTable, usersTable, registrationsTable } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
+import {
+  checkOrganizerLimits,
+  updateOrganizerLimits,
+} from "@/lib/organizer-limits";
 
 // GET all events
 export async function GET(req: Request) {
@@ -96,7 +100,7 @@ export async function GET(req: Request) {
   }
 }
 
-// POST new event (admin only)
+// POST new event (admin or organizer)
 export async function POST(req: Request) {
   try {
     const { userId, sessionId } = await auth();
@@ -106,7 +110,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin
+    // Check if user is admin or organizer
     const user = await db.query.usersTable.findFirst({
       where: eq(usersTable.id, userId),
     });
@@ -116,11 +120,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (user.role !== "admin") {
+    if (user.role !== "admin" && user.role !== "organizer") {
       return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
+        { error: "Forbidden - Admin or Organizer access required" },
         { status: 403 }
       );
+    }
+
+    // If user is organizer, check their limits
+    if (user.role === "organizer") {
+      try {
+        const limits = await checkOrganizerLimits(userId);
+        if (!limits.canCreateEvent) {
+          return NextResponse.json(
+            {
+              error: "Event limit reached",
+              details: `You can only host ${limits.maxEvents} event(s) at a time. You currently have ${limits.activeEvents} active event(s).`,
+              limits: {
+                maxEvents: limits.maxEvents,
+                activeEvents: limits.activeEvents,
+                remainingEvents: limits.remainingEvents,
+                organizerTier: limits.organizerTier,
+              },
+            },
+            { status: 403 }
+          );
+        }
+      } catch (error) {
+        console.error("Error checking organizer limits:", error);
+        return NextResponse.json(
+          { error: "Error checking organizer limits" },
+          { status: 500 }
+        );
+      }
     }
 
     const body = await req.json();
@@ -213,6 +245,16 @@ export async function POST(req: Request) {
         isActive: true,
       })
       .returning();
+
+    // Update organizer limits if user is organizer
+    if (user.role === "organizer") {
+      try {
+        await updateOrganizerLimits(userId);
+      } catch (error) {
+        console.error("Error updating organizer limits:", error);
+        // Don't fail the event creation if limits update fails
+      }
+    }
 
     return NextResponse.json(newEvent[0], { status: 201 });
   } catch (error) {
@@ -433,6 +475,22 @@ export async function DELETE(req: Request) {
       .set({ isActive: false })
       .where(eq(eventsTable.id, eventId))
       .returning();
+
+    // Update organizer limits if the event creator was an organizer
+    if (existingEvent.createdById) {
+      try {
+        const eventCreator = await db.query.usersTable.findFirst({
+          where: eq(usersTable.id, existingEvent.createdById),
+        });
+
+        if (eventCreator && eventCreator.role === "organizer") {
+          await updateOrganizerLimits(existingEvent.createdById);
+        }
+      } catch (error) {
+        console.error("Error updating organizer limits after deletion:", error);
+        // Don't fail the deletion if limits update fails
+      }
+    }
 
     return NextResponse.json(deletedEvent[0]);
   } catch (error) {

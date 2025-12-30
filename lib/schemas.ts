@@ -47,3 +47,32 @@ export const eventFormSchema = z
   );
 
 export type EventFormData = z.infer<typeof eventFormSchema>;
+
+// Organizer request form schema
+export const organizerRequestFormSchema = z.object({
+  eventType: z.enum(
+    [
+      "basketball",
+      "badminton",
+      "volleyball",
+      "tennis",
+      "table tennis",
+      "other",
+    ],
+    {
+      required_error: "Please select an event type",
+    }
+  ),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(1000, "Description must be less than 1000 characters"),
+  contactInfo: z
+    .string()
+    .min(1, "Contact info is required")
+    .max(255, "Contact info must be less than 255 characters"),
+});
+
+export type OrganizerRequestFormData = z.infer<
+  typeof organizerRequestFormSchema
+>;

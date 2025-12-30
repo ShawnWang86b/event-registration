@@ -1,3 +1,5 @@
+import { OrganizerRequestResponse } from "./api";
+
 // Admin Balance Management Types
 export type BalanceAdjustmentData = {
   action: "add" | "subtract";
@@ -25,4 +27,14 @@ export type BalanceAdjustmentResponse = {
   amount: number;
   adjustedBy: string;
   timestamp: string;
+};
+
+export type AdminOrganizerRequestsResponse = {
+  organizerRequests: OrganizerRequestResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 };

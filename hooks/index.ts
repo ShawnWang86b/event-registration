@@ -44,3 +44,8 @@ export { useRegistrationList } from "./use-registration-list";
 export { useEditEvent } from "./use-edit-event";
 export { useCalorieChart } from "./use-calorie-chart";
 export { useAdminUsersGrid } from "./use-admin-users-grid";
+export {
+  useMyOrganizerRequests,
+  useCreateOrganizerRequest,
+  organizerRequestKeys,
+} from "./use-organizer-requests";

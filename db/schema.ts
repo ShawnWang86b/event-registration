@@ -10,11 +10,12 @@ import {
   serial,
   primaryKey,
   real,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Enums
-export const roleEnum = pgEnum("role", ["admin", "user", "guest"]);
+export const roleEnum = pgEnum("role", ["admin", "user", "guest", "organizer"]);
 export const registrationStatusEnum = pgEnum("registration_status", [
   "registered",
   "waitlist",
@@ -29,12 +30,69 @@ export const transactionTypeEnum = pgEnum("transaction_type", [
   "monthly_snapshot", // Monthly balance record
 ]);
 
+export const sportsGroupRoleEnum = pgEnum("sports_group_role", [
+  "manager",
+  "assistant",
+]);
+
+export const organizerRequestStatusEnum = pgEnum("organizer_request_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+export const organizerTierEnum = pgEnum("organizer_tier", ["normal", "pro"]);
+
+export const eventTypeEnum=pgEnum("event_type",['basketball','badminton','volleyball','tennis','table tennis','other'])
+export const ageGroupEnum=pgEnum("age_group",["middle school","high school","college","adult","senior","unlimited"])
+export const genderGroupEnum=pgEnum("gender_group",['male','female','mixed'])
+// Organizers Table
+export const sportsGroupsTable = pgTable("sports_groups", {
+  id: varchar("id").primaryKey(),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  sportsGroupName: varchar({ length: 255 }).notNull(),
+  sportsGroupRole: sportsGroupRoleEnum("sports_group_role").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Organizer Requests Table
+export const organizerRequestsTable = pgTable("organizer_requests", {
+  id: uuid("id").primaryKey(),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  eventType: eventTypeEnum("event_type").notNull(),
+  description: text().notNull(),
+  contactInfo: varchar({ length: 255 }),
+  status: organizerRequestStatusEnum("status").notNull().default("pending"),
+  reviewedBy: varchar("reviewed_by").references(() => usersTable.id), // Admin who reviewed
+  reviewedAt: timestamp("reviewed_at"),
+  reviewNotes: text("review_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Organizer Limits Table - tracks active events per organizer
+export const organizerLimitsTable = pgTable("organizer_limits", {
+  id: serial("id").primaryKey(),
+  organizerId: varchar("organizer_id")
+    .notNull()
+    .references(() => usersTable.id),
+  maxEvents: integer("max_events").notNull(), // Current max events allowed (1 for normal, 10 for pro)
+  activeEvents: integer("active_events").notNull().default(0), // Current count of active events
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
 // Users Table
 export const usersTable = pgTable("users", {
   id: varchar("id").primaryKey(), // Use Clerk's ID
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
   role: roleEnum("role").notNull().default("user"),
+  organizerTier: organizerTierEnum("organizer_tier").default("normal"), // Only applies when role is "organizer"
   creditBalance: decimal("credit_balance", {
     precision: 10,
     scale: 2,
@@ -47,6 +105,11 @@ export const usersTable = pgTable("users", {
 export const usersRelations = relations(usersTable, ({ many }) => ({
   registrations: many(registrationsTable),
   createdEvents: many(eventsTable, { relationName: "createdEvents" }),
+  organizerRequests: many(organizerRequestsTable),
+  reviewedRequests: many(organizerRequestsTable, {
+    relationName: "reviewedRequests",
+  }),
+  organizerLimits: many(organizerLimitsTable),
 }));
 
 // Events Table
@@ -54,6 +117,9 @@ export const eventsTable = pgTable("events", {
   id: serial("id").primaryKey(),
   title: varchar({ length: 255 }).notNull(),
   description: text().notNull(),
+  type:eventTypeEnum("event_type").default("basketball"),
+  ageGroup:ageGroupEnum("age_group").default("unlimited"),
+  genderGroup:genderGroupEnum("gender_group").default("mixed"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
@@ -213,6 +279,31 @@ export const monthlyBalancesRelations = relations(
   ({ one }) => ({
     user: one(usersTable, {
       fields: [monthlyBalancesTable.userId],
+      references: [usersTable.id],
+    }),
+  })
+);
+
+export const organizerRequestsRelations = relations(
+  organizerRequestsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [organizerRequestsTable.userId],
+      references: [usersTable.id],
+    }),
+    reviewedBy: one(usersTable, {
+      fields: [organizerRequestsTable.reviewedBy],
+      references: [usersTable.id],
+      relationName: "reviewedRequests",
+    }),
+  })
+);
+
+export const organizerLimitsRelations = relations(
+  organizerLimitsTable,
+  ({ one }) => ({
+    organizer: one(usersTable, {
+      fields: [organizerLimitsTable.organizerId],
       references: [usersTable.id],
     }),
   })
